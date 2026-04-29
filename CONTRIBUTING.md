@@ -22,8 +22,8 @@ viewmodel as much as possible.
 2. Fork from `main`.
 3. Write your code.
 4. Write tests for your code.
-5. Run the test suite to ensure `./gradlew testAll`.
-6. Ensure that your code follows our styling by running `./gradlew ktlint` at the root of the project.
+5. Run the test suite to ensure `./gradlew test`.
+6. Ensure that your code follows our styling by running `./gradlew ktlintCheck` at the root of the project.
 7. Submit a pull request to `main`!
 
 ## Style Guides

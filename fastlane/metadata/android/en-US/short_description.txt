@@ -1,1 +1,1 @@
-Easily emulate Linux distributions and applications. No root required.
+Run Linux distributions and apps on Android. No root required. Updated for Android 13/14.

@@ -1,4 +1,4 @@
-The UserLAnd Icon is covered by the following license.
+The UserLAnd-Next Icon is covered by the following license.
 
 Attribution-ShareAlike 4.0 International
 
