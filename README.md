@@ -1,29 +1,32 @@
-![UserLAnd Feature Graphic](https://raw.githubusercontent.com/CypherpunkArmory/UserLAnd/master/fastlane/metadata/android/en-US/images/featureGraphic.png)
+# UserLAnd-Next
 
-# Welcome to UserLAnd
+![Build](https://github.com/Vodkashot28/UserLAnd/actions/workflows/build.yml/badge.svg)
 
-The easiest way to run a Linux distribution or application on Android.   
-Features: 
-* Run full linux distros or specific applications on top of Android.
-* Install and uninstall like a regular app.
-* No root required.
+A maintained fork of UserLAnd, modernized for Android 13/14.  
+Run full Linux distributions or specific applications directly on Android — no root required.
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=tech.ula)
-     
-## Have a bug report or a feature request?
-You can see our templates by visiting our [issue center](https://github.com/CypherpunkArmory/UserLAnd/issues).
+---
 
-## Want to contribute?
-See our [CONTRIBUTING](https://github.com/CypherpunkArmory/UserLAnd/blob/master/CONTRIBUTING.md) document.
+## ✨ Features
+- Run full Linux distros (Debian, Ubuntu, Arch, etc.) or individual apps.
+- Install/uninstall like a regular Android app.
+- No root required — sandboxed and secure.
+- Updated for modern Android APIs (13/14).
+- CI/CD powered builds with reproducible APKs.
 
-## Start using UserLAnd
-See our [Getting Started](https://github.com/CypherpunkArmory/UserLAnd/wiki/Getting-Started-in-UserLAnd) page.
+---
 
-## UserLAnd assets
-The assets that UserLAnd depends on and the scripts that build them are contained in other repositories.  
+## 📦 Installation
+Download the latest APK from [Releases](https://github.com/Vodkashot28/UserLAnd/releases).  
+Install it on your Android device and start provisioning your Linux environment.
 
-The common assets that are used for all distros and application are found at [CypherpunkArmory/UserLAnd-Assets-Support](https://github.com/CypherpunkArmory/UserLAnd-Assets-Support).  
+---
 
-Distribution or application specific assets are found under CypherpunkArmory/UserLAnd-Assets-(__Distribution/App__). For example, our Debian specific assets can be found at [CypherpunkArmory/UserLAnd-Assets-Debian](https://github.com/CypherpunkArmory/UserLAnd-Assets-Debian)
+## 🛠️ Development
+Clone the repo and build locally:
+
+```bash
+git clone https://github.com/Vodkashot28/UserLAnd.git
+cd UserLAnd
+./gradlew assembleDebug
+```

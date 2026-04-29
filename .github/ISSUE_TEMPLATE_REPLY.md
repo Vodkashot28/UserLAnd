@@ -2,7 +2,7 @@ It looks like you've posted an issue that requires more details for our team to 
 working on it.
 
 We have created some issue templates to assist you in this process. These issue templates can be
-found [here](https://github.com/CypherpunkArmory/UserLAnd/tree/master/.github/ISSUE_TEMPLATE).
+found [here](https://github.com/Vodkashot28/UserLAnd/tree/main/.github/ISSUE_TEMPLATE).
 
 To correctly follow the template, all of the headers from the template must be present in your
 new issue. The headers for each template are the lines that begin with a '#'. Include the
@@ -13,8 +13,8 @@ at all without that information, which is why we created this bot to help us out
 
 Please be as descriptive as possible when posting your issue, including _any_ steps we would need
 to recreate it. If reproducing your issue requires us to figure out how to reproduce it in the
-first place, it will marked low priority.
+first place, it will be marked low priority.
 
 If your issue is not updated to follow a template, we will likely close it within the week.
 
-Thanks for using UserLAnd and for helping us improve it!
+Thanks for using UserLAnd-Next and for helping us improve it!
