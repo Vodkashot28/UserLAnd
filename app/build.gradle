@@ -6,9 +6,15 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 
+apply plugin: 'de.undercouch.download'
+
 android {
     namespace "tech.ula"
     compileSdkVersion 34
+
+    buildFeatures {
+        buildConfig true
+    }
 
     defaultConfig {
         def vcode = (int)(((new Date().getTime()/1000) - 1559347200) / 10)
@@ -107,9 +113,6 @@ configurations {
     ktlint
 }
 
-tasks.withType(Test) {
-    jacoco.includeNoLocationClasses = true
-}
 
 task reportVersionCode {
     new File("$projectDir/versionCode.txt").text = "$project.android.defaultConfig.versionCode"
@@ -126,7 +129,7 @@ preBuild.dependsOn reportVersionName
 task ktlint(type: JavaExec, group: "verification") {
     description = "Check Kotlin code style."
     classpath = configurations.ktlint
-    main = "com.pinterest.ktlint.Main"
+    mainClass = "com.pinterest.ktlint.Main"
     args "src/**/*.kt"
 }
 check.dependsOn ktlint
@@ -134,7 +137,7 @@ check.dependsOn ktlint
 task ktlintFormat(type: JavaExec, group: "formatting") {
     description = "Fix Kotlin code style deviations."
     classpath = configurations.ktlint
-    main = "com.pinterest.ktlint.Main"
+    mainClass = "com.pinterest.ktlint.Main"
     args "-F", "src/**/*.kt"
 }
 
@@ -146,8 +149,8 @@ task testAll(dependsOn: ['test', 'connectedAndroidTest']) {
 task jacocoCoverageReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
 
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 
     def fileFilter = [ '**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*' ]
@@ -167,8 +170,8 @@ task jacocoCoverageReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', '
 task jacocoCoverageReportForCi(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
 
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 
     def fileFilter = [ '**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*' ]

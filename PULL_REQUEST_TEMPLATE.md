@@ -1,5 +1,4 @@
-**Note**
-Pull requests should use the `Squash and merge` option when merging into `main`.
+**Note:** Pull requests should use the `Squash and merge` option when merging into `main`.
 
 ## What changes does this PR introduce?
 
@@ -9,7 +8,10 @@ Pull requests should use the `Squash and merge` option when merging into `main`.
 
 ## Has this been manually tested? How?
 
-## What value does this provide to our end users?
+## Checklist
+- [ ] Tests written and passing (`./gradlew testDebugUnitTest`)
+- [ ] Lint passing (`./gradlew lint`)
+- [ ] Code style passing (`./gradlew ktlint`)
+- [ ] No new build warnings introduced
 
-## What GIF best describes this PR or how it makes you feel?
-![](paste_url_in_here)
+## What value does this provide to our end users?

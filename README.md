@@ -37,19 +37,27 @@ cd UserLAnd
 
 ### Requirements
 - Android Studio Hedgehog or later
-- JDK 17
+- JDK 17 (or JDK 21)
 - Android SDK 34 (compileSdk), minSdk 23
+- Gradle 8.7
 
 ### Tech Stack
-- Kotlin + Java 17 (`jvmTarget = "17"`)
-- AndroidX Lifecycle 2.8 (ViewModel, LiveData)
-- Room 2.6, OkHttp 4.12, Moshi 1.15
-- Billing 7.1 (Google Play Billing)
-- Sentry 7.x for crash reporting
-- Coroutines 1.8
+- Kotlin 1.9.23 + Java 17 (`jvmTarget = "17"`)
+- AndroidX Lifecycle 2.8.3 (ViewModel, LiveData)
+- Room 2.6.1, OkHttp 4.12.0, Moshi 1.15.1
+- Billing 7.1.1 (Google Play Billing)
+- Sentry 7.14.0 for crash reporting
+- Coroutines 1.8.1
+- Navigation 2.7.7
 
 ---
 
 ## 🔒 Permissions
 On Android 13+, the app uses scoped storage — no `READ/WRITE_EXTERNAL_STORAGE` required.  
 A `POST_NOTIFICATIONS` prompt is shown on first launch for foreground service notifications.
+
+---
+
+## 🤝 Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.  
+All contributions must follow the [Code of Conduct](CODE_OF_CONDUCT.md).
