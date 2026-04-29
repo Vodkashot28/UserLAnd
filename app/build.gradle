@@ -2,55 +2,37 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'kotlin-kapt'
 
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 
-apply plugin: 'jacoco'
-
-apply plugin: 'de.undercouch.download'
-
 android {
-    compileSdkVersion 30
+    namespace "tech.ula"
+    compileSdkVersion 34
 
     defaultConfig {
-        // Version code is generated as time since June 1, 2019. These allows for constantly
-        // sequential deployments to both production and beta tracks.
         def vcode = (int)(((new Date().getTime()/1000) - 1559347200) / 10)
 
         applicationId "tech.ula"
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion 23
+        targetSdkVersion 34
         versionCode vcode
         versionName "2.8.3"
-        
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
 
         vectorDrawables.useSupportLibrary = true
         buildConfigField 'boolean', 'ENABLE_PLAY_SERVICES', 'true'
 
-        //these are used to help determine the resolution
         buildConfigField 'boolean', 'FORCE_PORTRAIT_GEOMETRY', 'true'
         buildConfigField 'int', "MAX_DIMENSION", "1280"
         buildConfigField 'int', "MIN_DIMENSION", "360"
-
-        // Ignore Sentry packages that cause lint failure
-        lintOptions {
-            lintConfig file("$projectDir/src/main/resources/lint.xml")
-        }
 
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
-        }
-
-        compileOptions {
-            sourceCompatibility 1.8
-            targetCompatibility 1.8
         }
 
         testOptions {
@@ -110,14 +92,15 @@ android {
             includeAndroidResources = true
         }
     }
-}
 
-jacoco {
-    toolVersion = "$jacoco_version"
-}
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 
-androidExtensions {
-    experimental true
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 configurations {
@@ -244,35 +227,34 @@ task checkIfAssetsMissing {
 preBuild.dependsOn checkIfAssetsMissing
 
 dependencies {
-    def moshi_version = '1.8.0'
-    def okhttp_version = '3.14.7'
-    def sentry_version = '1.7.22'
-    def slf4j_version = '1.7.26'
+    def moshi_version = '1.15.1'
+    def okhttp_version = '4.12.0'
+    def sentry_version = '7.14.0'
+    def slf4j_version = '2.0.13'
 
-    def kotlinx_coroutines_version = '1.0.0'
-    def kotlin_jdk_version = '1.3.61'
+    def kotlinx_coroutines_version = '1.8.1'
 
     // Androidx versions
-    def room_version = '2.1.0-beta01'
-    def lifecycle_version = '2.2.0-alpha01'
-    def support_library_version = '1.1.0-alpha06'
-    def preference_version = '1.1.0-alpha05'
-    def ktx_version = '1.0.2'
-    def billing_version = '3.0.3'
+    def room_version = '2.6.1'
+    def lifecycle_version = '2.8.3'
+    def support_library_version = '1.12.0'
+    def preference_version = '1.2.1'
+    def ktx_version = '1.13.1'
+    def billing_version = '7.1.1'
 
     implementation project(':terminal-term')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_jdk_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinx_coroutines_version"
 
     implementation "androidx.core:core-ktx:$ktx_version"
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "androidx.preference:preference:$preference_version"
 
     implementation "com.google.android.material:material:$support_library_version"
@@ -285,18 +267,17 @@ dependencies {
     implementation "org.slf4j:slf4j-nop:$slf4j_version"
 
     implementation "com.android.billingclient:billing-ktx:$billing_version"
-    implementation "com.google.android.gms:play-services-base:17.2.1"
+    implementation "com.google.android.gms:play-services-base:18.5.0"
 
-    def mockito_version = '2.23.0'
-    def mockito_kotlin_version = '2.1.0'
-    def core_testing_version = '2.0.0-beta01'
-    def androidx_test_version = '1.2.0'
-    def androidx_test_ext_version = '1.1.0'
+    def mockito_version = '5.12.0'
+    def core_testing_version = '2.2.0'
+    def androidx_test_version = '1.6.1'
+    def androidx_test_ext_version = '1.2.1'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_kotlin_version"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:5.4.0"
     testImplementation "androidx.arch.core:core-testing:$core_testing_version"
     testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
     androidTestImplementation "androidx.arch.core:core-testing:$core_testing_version"
@@ -305,13 +286,12 @@ dependencies {
     androidTestImplementation "androidx.test:rules:$androidx_test_version"
     androidTestImplementation "androidx.test.ext:junit:$androidx_test_ext_version"
     // Barista packages espresso-core and espresso-contrib
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
-    androidTestImplementation('com.schibsted.spain:barista:3.1.0') {
-        exclude group: 'com.android.support'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.6.1'
+    androidTestImplementation('com.adevinta.android:barista:4.3.0') {
         exclude group: 'org.jetbrains.kotlin'
     }
     androidTestUtil "androidx.test:orchestrator:$androidx_test_version"
 
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.11.0'
 
 }

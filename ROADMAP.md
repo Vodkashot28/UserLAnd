@@ -5,7 +5,7 @@ Our goal is to bring Linux-on-Android into 2026 with stability, security, and co
 
 ---
 
-## 📍 Phase 1: Foundation & Audit
+## 📍 Phase 1: Foundation & Audit ✅
 - Fork and stabilize the codebase.
 - Audit dependencies (Gradle, Kotlin, Android libraries).
 - Reproduce and document crashes on Android 13/14.
@@ -14,11 +14,13 @@ Our goal is to bring Linux-on-Android into 2026 with stability, security, and co
 
 ---
 
-## ⚙️ Phase 2: Compatibility Fixes
-- Adapt file handling to Android 11+ scoped storage.
-- Rewrite background services for Android 12+ restrictions.
-- Update runtime permission requests (network, storage).
-- Replace legacy networking stack with OkHttp/modern equivalents.
+## ⚙️ Phase 2: Compatibility Fixes ✅
+- Adapted file handling to Android 11+ scoped storage (no `READ/WRITE_EXTERNAL_STORAGE` on API 33+).
+- Rewrote background services for Android 12+ restrictions (`STOP_FOREGROUND_REMOVE`, `foregroundServiceType=specialUse`).
+- Updated runtime permission requests (`POST_NOTIFICATIONS` on API 33+, `FLAG_IMMUTABLE` on PendingIntents).
+- Replaced legacy networking stack with OkHttp 4.12.
+- Migrated all dependencies to current stable versions (Room 2.6, Lifecycle 2.8, Billing 7.1, Coroutines 1.8, Sentry 7.x).
+- Upgraded to Java 17 / Kotlin JVM target 17.
 
 ---
 

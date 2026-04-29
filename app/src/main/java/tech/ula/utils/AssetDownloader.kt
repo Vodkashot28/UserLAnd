@@ -192,7 +192,7 @@ class DownloadManagerWrapper(private val downloadManager: DownloadManager) {
         val query = generateQuery(id)
         val cursor = generateCursor(query)
         if (cursor.moveToFirst()) {
-            val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
             return status == DownloadManager.STATUS_SUCCESSFUL
         }
         return false
@@ -202,7 +202,7 @@ class DownloadManagerWrapper(private val downloadManager: DownloadManager) {
         val query = generateQuery(id)
         val cursor = generateCursor(query)
         if (cursor.moveToFirst()) {
-            val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
             return status == DownloadManager.STATUS_FAILED
         }
         return false
@@ -212,7 +212,7 @@ class DownloadManagerWrapper(private val downloadManager: DownloadManager) {
         val query = generateQuery(id)
         val cursor = generateCursor(query)
         if (cursor.moveToFirst()) {
-            val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_REASON))
+            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
             return DownloadFailureLocalizationData(resId = when (status) {
                 in 100..500 -> R.string.download_failure_http_error
                 1008 -> R.string.download_failure_cannot_resume

@@ -90,7 +90,7 @@ class ServerService : Service(), CoroutineScope {
         super.onTaskRemoved(rootIntent)
         // Redundancy to ensure no hanging processes, given broad device spectrum.
         this.coroutineContext.cancel()
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
@@ -103,7 +103,7 @@ class ServerService : Service(), CoroutineScope {
     private fun removeSession(session: Session) {
         activeSessions.remove(session.pid)
         if (activeSessions.isEmpty()) {
-            stopForeground(true)
+            stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
     }
