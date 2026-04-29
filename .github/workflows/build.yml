@@ -62,5 +62,11 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: ./apk/*.apk
+        body: |
+          <p align="center">
+            <img src="https://raw.githubusercontent.com/Vodkashot28/UserLAnd/main/fastlane/metadata/android/en-US/images/featureGraphic_next.png" width="600"/>
+          </p>
+
+          Download the APK below and install on your Android device.
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

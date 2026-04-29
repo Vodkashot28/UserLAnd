@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/featureGraphic_next.png" alt="UserLAnd-Next Logo" width="600"/>
+</p>
+
 # UserLAnd-Next
 
 ![Build](https://github.com/Vodkashot28/UserLAnd/actions/workflows/build.yml/badge.svg)
