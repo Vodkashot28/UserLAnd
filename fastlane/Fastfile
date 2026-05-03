@@ -37,7 +37,7 @@ platform :android do
     release_name = "v" + version_name
 
     set_github_release(
-      repository_name: "CypherpunkArmory/UserLAnd",
+      repository_name: "Vodkashot28/UserLAnd",
       api_token: ENV["GITHUB_RELEASE_TOKEN"],
       name: release_name,
       tag_name: release_name,

@@ -44,6 +44,8 @@ android {
         testOptions {
             execution 'ANDROIDX_TEST_ORCHESTRATOR'
         }
+
+        manifestPlaceholders = [sentryDsn: System.getenv("SENTRY_DSN") ?: ""]
     }
 
     signingConfigs {
@@ -192,7 +194,7 @@ ext.libDir = "$project.projectDir/src/main/jniLibs"
 
 task downloadAssets(type: Download) {
     def assetVersion = "v1.2.7"
-    def baseUrl = "https://github.com/CypherpunkArmory/UserLAnd-Assets-Support/releases/download/$assetVersion"
+    def baseUrl = "https://github.com/Vodkashot28/UserLAnd-Assets-Support/releases/download/$assetVersion"
     for (arch in architectures) {
         src "$baseUrl/$arch-assets.zip"
         dest buildDir

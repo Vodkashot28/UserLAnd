@@ -32,6 +32,8 @@ jobs:
           ${{ runner.os }}-gradle-
 
     - name: Build debug APK
+      env:
+        SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       run: ./gradlew assembleDebug
 
     - name: Run unit tests
@@ -40,54 +42,41 @@ jobs:
     - name: Run Lint
       run: ./gradlew lint
 
-    - name: Upload build artifact
+    - name: Upload debug APK
       uses: actions/upload-artifact@v4
       with:
-        name: UserLAnd-APK
+        name: UserLAnd-Debug-APK
         path: app/build/outputs/apk/debug/*.apk
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '21'
-
-    - name: Cache Gradle
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
+        retention-days: 7
 
     - name: Build release APK
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       env:
         ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       run: ./gradlew assembleRelease
 
-    - name: Upload release artifact
+    - name: Upload release APK
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
         name: UserLAnd-Release-APK
         path: app/build/outputs/apk/release/*.apk
+        retention-days: 30
+
+    - name: Read version name
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      id: version
+      run: echo "name=v$(cat app/versionName.txt)" >> $GITHUB_OUTPUT
 
     - name: Create GitHub Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v${{ github.run_number }}
+        tag_name: ${{ steps.version.outputs.name }}
+        name: ${{ steps.version.outputs.name }}
         files: app/build/outputs/apk/release/*.apk
         body: |
           <p align="center">
