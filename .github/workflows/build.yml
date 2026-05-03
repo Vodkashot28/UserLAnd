@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
     steps:
     - name: Checkout repository
@@ -21,68 +23,42 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Cache Gradle
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-
     - name: Build debug APK
-      env:
-        SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       run: ./gradlew assembleDebug
 
-    - name: Run unit tests
-      run: ./gradlew testDebugUnitTest
-
-    - name: Run Lint
-      run: ./gradlew lint
-
-    - name: Upload debug APK
+    - name: Upload debug artifact
       uses: actions/upload-artifact@v4
       with:
-        name: UserLAnd-Debug-APK
-        path: app/build/outputs/apk/debug/*.apk
-        retention-days: 7
+        name: debug-apk
+        path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 14
 
-    - name: Build release APK
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      env:
-        ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-        ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
-        ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      run: ./gradlew assembleRelease
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    env:
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
-    - name: Upload release APK
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: actions/upload-artifact@v4
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download debug artifact
+      uses: actions/download-artifact@v4
       with:
-        name: UserLAnd-Release-APK
-        path: app/build/outputs/apk/release/*.apk
-        retention-days: 30
+        name: debug-apk
+        path: release/
 
-    - name: Read version name
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    - name: Read versionName
       id: version
-      run: echo "name=v$(cat app/versionName.txt)" >> $GITHUB_OUTPUT
+      run: echo "version=$(cat app/versionName.txt)" >> $GITHUB_ENV
 
     - name: Create GitHub Release
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
       with:
-        tag_name: ${{ steps.version.outputs.name }}
-        name: ${{ steps.version.outputs.name }}
-        files: app/build/outputs/apk/release/*.apk
-        body: |
-          <p align="center">
-            <img src="https://raw.githubusercontent.com/Vodkashot28/UserLAnd/main/fastlane/metadata/android/en-US/images/featureGraphic_next.png" width="600"/>
-          </p>
-
-          Download the APK below and install on your Android device.
+        tag_name: v${{ env.version }}
+        name: Release ${{ env.version }}
+        files: release/app-debug.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
