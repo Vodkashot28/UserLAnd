@@ -105,6 +105,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    packagingOptions {
+        doNotStrip "**/*.so"
+    }
 }
 
 kapt {
