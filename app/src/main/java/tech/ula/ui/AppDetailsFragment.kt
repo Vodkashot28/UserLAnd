@@ -10,9 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import kotlinx.android.synthetic.main.frag_app_details.* // ktlint-disable no-wildcard-imports
+import tech.ula.databinding.FragAppDetailsBinding
 import tech.ula.R
 import tech.ula.model.repositories.UlaDatabase
 import tech.ula.utils.* // ktlint-disable no-wildcard-imports
@@ -24,21 +25,27 @@ import tech.ula.viewmodel.AppDetailsViewmodelFactory
 class AppDetailsFragment : Fragment() {
 
     private lateinit var activityContext: Activity
+    private var _binding: FragAppDetailsBinding? = null
+    private val binding get() = _binding!!
 
     private val args: AppDetailsFragmentArgs by navArgs()
     private val app by lazy { args.app!! }
 
-    private val viewModel by lazy {
-        val sessionDao = UlaDatabase.getInstance(activityContext).sessionDao()
-        val appDetails = AppDetails(activityContext.filesDir.path, activityContext.resources)
+    private val viewModel: AppDetailsViewModel by viewModels {
+        val sessionDao = UlaDatabase.getInstance(requireActivity()).sessionDao()
+        val appDetails = AppDetails(requireActivity().filesDir.path, requireActivity().resources)
         val buildVersion = Build.VERSION.SDK_INT
-        val factory = AppDetailsViewmodelFactory(sessionDao, appDetails, buildVersion, activityContext.getSharedPreferences("apps", Context.MODE_PRIVATE))
-        ViewModelProviders.of(this, factory)
-                .get(AppDetailsViewModel::class.java)
+        AppDetailsViewmodelFactory(sessionDao, appDetails, buildVersion, requireActivity().getSharedPreferences("apps", Context.MODE_PRIVATE))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.frag_app_details, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragAppDetailsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -46,9 +53,7 @@ class AppDetailsFragment : Fragment() {
 
         activityContext = activity!!
         viewModel.viewState.observe(this, Observer<AppDetailsViewState> { viewState ->
-            viewState?.let {
-                handleViewStateChange(viewState)
-            }
+            viewState?.let { handleViewStateChange(viewState) }
         })
         viewModel.submitEvent(AppDetailsEvent.SubmitApp(app))
         setupPreferredServiceTypeRadioGroup()
@@ -56,29 +61,28 @@ class AppDetailsFragment : Fragment() {
     }
 
     private fun handleViewStateChange(viewState: AppDetailsViewState) {
-        apps_icon.setImageURI(viewState.appIconUri)
-        apps_title.text = viewState.appTitle
-        apps_description.text = viewState.appDescription
+        binding.appsIcon.setImageURI(viewState.appIconUri)
+        binding.appsTitle.text = viewState.appTitle
+        binding.appsDescription.text = viewState.appDescription
         handleEnableRadioButtons(viewState)
         handleShowStateHint(viewState)
 
         if (viewState.selectedServiceTypeButton != null) {
-            apps_service_type_preferences.check(viewState.selectedServiceTypeButton)
+            binding.appsServiceTypePreferences.check(viewState.selectedServiceTypeButton)
         }
 
-        checkbox_auto_start.setChecked(viewState.autoStartEnabled)
+        binding.checkboxAutoStart.setChecked(viewState.autoStartEnabled)
     }
 
     private fun handleEnableRadioButtons(viewState: AppDetailsViewState) {
-        apps_ssh_preference.isEnabled = viewState.sshEnabled
-        apps_vnc_preference.isEnabled = viewState.vncEnabled
+        binding.appsSshPreference.isEnabled = viewState.sshEnabled
+        binding.appsVncPreference.isEnabled = viewState.vncEnabled
 
         if (viewState.xsdlEnabled) {
-            apps_xsdl_preference.isEnabled = true
+            binding.appsXsdlPreference.isEnabled = true
         } else {
-            // Xsdl is unavailable on Android 9 and greater
-            apps_xsdl_preference.isEnabled = false
-            apps_xsdl_preference.alpha = 0.5f
+            binding.appsXsdlPreference.isEnabled = false
+            binding.appsXsdlPreference.alpha = 0.5f
 
             val xsdlSupportedText = view?.find<TextView>(R.id.text_xsdl_version_supported_description)
             xsdlSupportedText?.visibility = View.VISIBLE
@@ -87,21 +91,21 @@ class AppDetailsFragment : Fragment() {
 
     private fun handleShowStateHint(viewState: AppDetailsViewState) {
         if (viewState.describeStateHintEnabled) {
-            text_describe_state.visibility = View.VISIBLE
-            text_describe_state.setText(viewState.describeStateText!!)
+            binding.textDescribeState.visibility = View.VISIBLE
+            binding.textDescribeState.setText(viewState.describeStateText!!)
         } else {
-            text_describe_state.visibility = View.GONE
+            binding.textDescribeState.visibility = View.GONE
         }
     }
 
     private fun setupPreferredServiceTypeRadioGroup() {
-        apps_service_type_preferences.setOnCheckedChangeListener { _, checkedId ->
+        binding.appsServiceTypePreferences.setOnCheckedChangeListener { _, checkedId ->
             viewModel.submitEvent(AppDetailsEvent.ServiceTypeChanged(checkedId, app))
         }
     }
 
     private fun setupAutoStartCheckbox() {
-        checkbox_auto_start.setOnCheckedChangeListener { _, checked ->
+        binding.checkboxAutoStart.setOnCheckedChangeListener { _, checked ->
             viewModel.submitEvent(AppDetailsEvent.AutoStartChanged(checked, app))
         }
     }

@@ -1,8 +1,7 @@
 package tech.ula.ui
 
-import android.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -15,7 +14,7 @@ import android.view.MenuItem
 import android.view.MenuInflater
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
-import kotlinx.android.synthetic.main.frag_app_list.* // ktlint-disable no-wildcard-imports
+import tech.ula.databinding.FragAppListBinding
 import tech.ula.MainActivity
 import tech.ula.R
 import tech.ula.ServerService
@@ -35,36 +34,26 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
         fun appHasBeenSelected(app: App, autoStart: Boolean)
     }
 
-    private val doOnAppSelection: AppSelection by lazy {
-        activityContext
-    }
-
+    private val doOnAppSelection: AppSelection by lazy { activityContext }
     private lateinit var activityContext: MainActivity
+    private var _binding: FragAppListBinding? = null
+    private val binding get() = _binding!!
 
-    private val appsAdapter by lazy {
-        AppsListAdapter(activityContext, this)
-    }
-
+    private val appsAdapter by lazy { AppsListAdapter(activityContext, this) }
     private var refreshStatus = RefreshStatus.INACTIVE
+    private val appsPreferences by lazy { AppsPreferences(activityContext) }
 
-    private val appsPreferences by lazy {
-        AppsPreferences(activityContext)
-    }
-
-    private val viewModel: AppsListViewModel by lazy {
+    private val viewModel: AppsListViewModel by viewModels {
         val ulaDatabase = UlaDatabase.getInstance(activityContext)
-        val appsDao = ulaDatabase.appsDao()
         val githubFetcher = GithubAppsFetcher("${activityContext.filesDir}")
-
-        val appsRepository = AppsRepository(appsDao, githubFetcher, appsPreferences)
-        ViewModelProviders.of(this, AppsListViewModelFactory(appsRepository))
-                .get(AppsListViewModel::class.java)
+        val appsRepository = AppsRepository(ulaDatabase.appsDao(), githubFetcher, appsPreferences)
+        AppsListViewModelFactory(appsRepository)
     }
 
     private val appsObserver = Observer<List<App>> {
         it?.let { list ->
             appsAdapter.updateApps(list)
-            list_apps.scrollToPosition(0)
+            binding.listApps.scrollToPosition(0)
             if (list.isEmpty() || userlandIsNewVersion()) {
                 doRefresh()
             }
@@ -72,16 +61,13 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
     }
 
     private val activeAppsObserver = Observer<List<App>> {
-        it?.let { list ->
-            appsAdapter.updateActiveApps(list)
-        }
+        it?.let { list -> appsAdapter.updateActiveApps(list) }
     }
 
     private val refreshStatusObserver = Observer<RefreshStatus> {
         it?.let { newStatus ->
             refreshStatus = newStatus
-            swipe_refresh.isRefreshing = refreshStatus == RefreshStatus.ACTIVE
-
+            binding.swipeRefresh.isRefreshing = refreshStatus == RefreshStatus.ACTIVE
             if (refreshStatus == RefreshStatus.FAILED) showRefreshUnavailableDialog()
         }
     }
@@ -99,7 +85,7 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when {
             item.itemId == R.id.menu_item_refresh -> {
-                swipe_refresh.isRefreshing = true
+                binding.swipeRefresh.isRefreshing = true
                 doRefresh()
                 true
             }
@@ -123,8 +109,14 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.frag_app_list, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragAppListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -134,12 +126,12 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
         viewModel.getActiveApps().observe(viewLifecycleOwner, activeAppsObserver)
         viewModel.getRefreshStatus().observe(viewLifecycleOwner, refreshStatusObserver)
 
-        registerForContextMenu(list_apps)
-        list_apps.layoutManager = LinearLayoutManager(list_apps.context)
-        list_apps.adapter = appsAdapter
+        registerForContextMenu(binding.listApps)
+        binding.listApps.layoutManager = LinearLayoutManager(binding.listApps.context)
+        binding.listApps.adapter = appsAdapter
 
-        swipe_refresh.setOnRefreshListener { doRefresh() }
-        swipe_refresh.setColorSchemeResources(
+        binding.swipeRefresh.setOnRefreshListener { doRefresh() }
+        binding.swipeRefresh.setColorSchemeResources(
                 R.color.holo_blue_light,
                 R.color.holo_green_light,
                 R.color.holo_orange_light,
