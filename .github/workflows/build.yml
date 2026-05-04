@@ -41,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
     env:
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
@@ -55,11 +57,12 @@ jobs:
         path: release/
 
     - name: Read versionName
-      id: version
-      run: echo "version=$(cat app/versionName.txt)" >> $GITHUB_ENV
+      run: |
+        VERSION=$(grep -m1 'versionName "' app/build.gradle | grep -oP '"\K[^"]+')
+        echo "version=$VERSION" >> $GITHUB_ENV
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: v${{ env.version }}
         name: Release ${{ env.version }}
