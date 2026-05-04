@@ -1,5 +1,7 @@
 package tech.ula.ui
 
+import android.content.DialogInterface
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.fragment.app.viewModels
 import android.content.Intent
@@ -161,8 +163,7 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
         AlertDialog.Builder(activityContext)
                 .setMessage(R.string.alert_network_required_for_refresh)
                 .setTitle(R.string.general_error_title)
-                .setPositiveButton(R.string.button_ok) {
-                    dialog, _ ->
+                .setPositiveButton(R.string.button_ok) { dialog: DialogInterface, _: Int ->
                     dialog.dismiss()
                 }
                 .create().show()
