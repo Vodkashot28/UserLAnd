@@ -2,11 +2,9 @@ package tech.ula.utils
 
 import android.content.Context
 import android.util.Log
+import io.sentry.Breadcrumb
 import io.sentry.Sentry
-import io.sentry.android.AndroidSentryClientFactory
-import io.sentry.event.BreadcrumbBuilder
-import io.sentry.event.Event
-import io.sentry.event.EventBuilder
+import io.sentry.SentryLevel
 import tech.ula.viewmodel.IllegalState
 
 sealed class BreadcrumbType {
@@ -59,47 +57,39 @@ interface Logger {
 
 class SentryLogger : Logger {
     override fun initialize(context: Context?) {
-        Sentry.init(AndroidSentryClientFactory(context!!))
+        // Sentry is initialized via AndroidManifest.xml meta-data
     }
 
     override fun addBreadcrumb(breadcrumb: UlaBreadcrumb) {
         val key = "${breadcrumb.type}"
         val value = "${breadcrumb.originatingClass}: ${breadcrumb.details}"
-        val sentryBreadcrumb = BreadcrumbBuilder()
-                .setCategory(key)
-                .setMessage(value)
-                .build()
-        Sentry.getContext().recordBreadcrumb(sentryBreadcrumb)
+        Sentry.addBreadcrumb(Breadcrumb().apply {
+            category = key
+            message = value
+            level = SentryLevel.INFO
+        })
         Log.i("Breadcrumb", "$key $value")
     }
 
     override fun addExceptionBreadcrumb(err: Exception) {
         val stackTrace = err.stackTrace.first()
-        val breadcrumb = BreadcrumbBuilder()
-                .setCategory("Exception")
-                .setData(mapOf(
-                        "type" to err.javaClass.simpleName,
-                        "file" to stackTrace.fileName,
-                        "lineNumber" to stackTrace.lineNumber.toString()
-                ))
-                .build()
-        Sentry.getContext().recordBreadcrumb(breadcrumb)
+        Sentry.addBreadcrumb(Breadcrumb().apply {
+            category = "Exception"
+            setData("type", err.javaClass.simpleName)
+            setData("file", stackTrace.fileName)
+            setData("lineNumber", stackTrace.lineNumber.toString())
+            level = SentryLevel.ERROR
+        })
     }
 
     override fun sendIllegalStateLog(state: IllegalState) {
         val message = state.javaClass.simpleName
-        val event = EventBuilder()
-                .withMessage(message)
-                .withLevel(Event.Level.ERROR)
-        Sentry.capture(event)
+        Sentry.captureMessage(message, SentryLevel.ERROR)
         Log.e("ILLEGAL_STATE", message)
     }
 
     override fun sendEvent(message: String) {
-        val event = EventBuilder()
-                .withMessage(message)
-                .withLevel(Event.Level.ERROR)
-        Sentry.capture(event)
+        Sentry.captureMessage(message, SentryLevel.ERROR)
         Log.e("EVENT", message)
     }
 }

@@ -84,14 +84,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         CollectionOptInPrompter(this, findViewById(R.id.layout_user_prompt_insert))
     }
 
-    val billingManager by lazy {
-        BillingManager(this, contributionPrompter.onEntitledSubPurchases, contributionPrompter.onEntitledInAppPurchases, contributionPrompter.onPurchase, contributionPrompter.onSubscriptionSupportedChecked)
-    }
-
-    private val contributionPrompter by lazy {
-        ContributionPrompter(this, findViewById(R.id.layout_user_prompt_insert))
-    }
-
     private val downloadBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
@@ -171,10 +163,6 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
         if (optInPrompter.viewShouldBeShown()) {
             optInPrompter.showView()
-        }
-
-        if (contributionPrompter.viewShouldBeShown()) {
-            contributionPrompter.showView()
         }
 
         handleQWarning()
@@ -264,13 +252,10 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
     override fun onResume() {
         super.onResume()
-        billingManager.querySubPurchases()
-        billingManager.queryInAppPurchases()
         viewModel.handleOnResume()
     }
 
     override fun onDestroy() {
-        billingManager.destroy()
         super.onDestroy()
     }
 
