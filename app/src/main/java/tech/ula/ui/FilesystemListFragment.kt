@@ -2,6 +2,7 @@ package tech.ula.ui
 
 import android.app.AlertDialog
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.viewModels
 import android.content.Intent
 import android.os.Bundle
@@ -47,14 +48,14 @@ class FilesystemListFragment : Fragment() {
         val busyboxExecutor = BusyboxExecutor(ulaFiles, prootDebugLogger)
 
         val filesystemManager = FilesystemManager(ulaFiles, busyboxExecutor)
-        ViewModelProviders.of(this, FilesystemListViewmodelFactory(filesystemDao, sessionDao, filesystemManager)).get(FilesystemListViewModel::class.java)
+        ViewModelProvider(this, FilesystemListViewmodelFactory(filesystemDao, sessionDao, filesystemManager)).get(FilesystemListViewModel::class.java)
     }
 
     private val filesystemChangeObserver = Observer<List<Filesystem>> {
         it?.let { list ->
             filesystemList = list
 
-            list_filesystems.adapter = FilesystemListAdapter(activityContext, filesystemList)
+            binding.listFilesystems.adapter = FilesystemListAdapter(activityContext, filesystemList)
         }
     }
 
@@ -88,8 +89,17 @@ class FilesystemListFragment : Fragment() {
         } else super.onOptionsItemSelected(item)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.frag_filesystem_list, container, false)
+    private var _binding: FragFilesystemListBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragFilesystemListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -99,7 +109,7 @@ class FilesystemListFragment : Fragment() {
         filesystemListViewModel.getAllFilesystems().observe(viewLifecycleOwner, filesystemChangeObserver)
         filesystemListViewModel.getViewState().observe(viewLifecycleOwner, viewStateObserver)
         filesystemListViewModel.getAllActiveSessions().observe(viewLifecycleOwner, activeSessionObserver)
-        registerForContextMenu(list_filesystems)
+        registerForContextMenu(binding.listFilesystems)
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {

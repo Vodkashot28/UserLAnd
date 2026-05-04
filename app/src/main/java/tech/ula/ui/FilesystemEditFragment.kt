@@ -2,7 +2,7 @@ package tech.ula.ui
 
 import android.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
@@ -20,8 +20,8 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
-import kotlinx.android.synthetic.main.frag_filesystem_edit.*
 import tech.ula.MainActivity
+import tech.ula.databinding.FragFilesystemEditBinding
 import tech.ula.R
 import tech.ula.model.repositories.UlaDatabase
 import tech.ula.utils.PermissionHandler
@@ -37,6 +37,9 @@ import java.util.Locale
 
 class FilesystemEditFragment : Fragment() {
 
+    private var _binding: FragFilesystemEditBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var activityContext: MainActivity
 
     private val IMPORT_FILESYSTEM_REQUEST_CODE = 5
@@ -51,13 +54,14 @@ class FilesystemEditFragment : Fragment() {
             when (importStatus) {
                 is ImportSuccess -> dialogBuilder.setMessage(R.string.import_success).create().show()
                 is ImportFailure -> dialogBuilder.setMessage(R.string.import_failure).create().show()
+                is UriUnselected -> {}
             }
         }
     }
 
     private val filesystemEditViewModel: FilesystemEditViewModel by lazy {
         val ulaDatabase = UlaDatabase.getInstance(activityContext)
-        ViewModelProviders.of(this, FilesystemEditViewmodelFactory(ulaDatabase)).get(FilesystemEditViewModel::class.java)
+        ViewModelProvider(this, FilesystemEditViewmodelFactory(ulaDatabase)).get(FilesystemEditViewModel::class.java)
     }
 
     private val distributionList by lazy {
@@ -79,8 +83,14 @@ class FilesystemEditFragment : Fragment() {
         else super.onOptionsItemSelected(item)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.frag_filesystem_edit, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragFilesystemEditBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -89,14 +99,14 @@ class FilesystemEditFragment : Fragment() {
         filesystemEditViewModel.getImportStatusLiveData().observe(viewLifecycleOwner, filesystemImportStatusObserver)
 
         if (distributionList.isNotEmpty()) {
-            spinner_filesystem_type.adapter = ArrayAdapter(activityContext,
+            binding.spinnerFilesystemType.adapter = ArrayAdapter(activityContext,
                     android.R.layout.simple_spinner_dropdown_item,
                     distributionList.map { it.capitalize() })
         }
         if (editExisting) {
-            for (i in 0 until spinner_filesystem_type.adapter.count) {
-                val item = spinner_filesystem_type.adapter.getItem(i).toString().toLowerCase(Locale.ENGLISH)
-                if (item == filesystem.distributionType) spinner_filesystem_type.setSelection(i)
+            for (i in 0 until binding.spinnerFilesystemType.adapter.count) {
+                val item = binding.spinnerFilesystemType.adapter.getItem(i).toString().toLowerCase(Locale.ENGLISH)
+                if (item == filesystem.distributionType) binding.spinnerFilesystemType.setSelection(i)
             }
         }
     }
@@ -107,13 +117,13 @@ class FilesystemEditFragment : Fragment() {
         setupTextInputs()
 
         if (editExisting) {
-            btn_show_advanced_options.visibility = View.GONE
-            spinner_filesystem_type.isEnabled = false
+            binding.btnShowAdvancedOptions.visibility = View.GONE
+            binding.spinnerFilesystemType.isEnabled = false
         } else {
             setupImportButton()
             setupAdvancedOptionButton()
         }
-        spinner_filesystem_type.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.spinnerFilesystemType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
 
@@ -124,22 +134,22 @@ class FilesystemEditFragment : Fragment() {
     }
 
     private fun setupTextInputs() {
-        input_filesystem_name.setText(filesystem.name)
-        input_filesystem_username.setText(filesystem.defaultUsername)
-        input_filesystem_password.setText(filesystem.defaultPassword)
-        input_filesystem_vncpassword.setText(filesystem.defaultVncPassword)
+        binding.inputFilesystemName.setText(filesystem.name)
+        binding.inputFilesystemUsername.setText(filesystem.defaultUsername)
+        binding.inputFilesystemPassword.setText(filesystem.defaultPassword)
+        binding.inputFilesystemVncpassword.setText(filesystem.defaultVncPassword)
 
         if (editExisting) {
-            input_filesystem_username.isEnabled = false
-            input_filesystem_password.isEnabled = false
-            input_filesystem_vncpassword.isEnabled = false
+            binding.inputFilesystemUsername.isEnabled = false
+            binding.inputFilesystemPassword.isEnabled = false
+            binding.inputFilesystemVncpassword.isEnabled = false
         }
 
         if (filesystem.isAppsFilesystem) {
-            input_filesystem_name.isEnabled = false
+            binding.inputFilesystemName.isEnabled = false
         }
 
-        input_filesystem_name.addTextChangedListener(object : TextWatcher {
+        binding.inputFilesystemName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 filesystem.name = p0.toString()
             }
@@ -148,7 +158,7 @@ class FilesystemEditFragment : Fragment() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         })
 
-        input_filesystem_username.addTextChangedListener(object : TextWatcher {
+        binding.inputFilesystemUsername.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
 
                 filesystem.defaultUsername = p0.toString()
@@ -158,7 +168,7 @@ class FilesystemEditFragment : Fragment() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         })
 
-        input_filesystem_password.addTextChangedListener(object : TextWatcher {
+        binding.inputFilesystemPassword.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 filesystem.defaultPassword = p0.toString()
             }
@@ -167,7 +177,7 @@ class FilesystemEditFragment : Fragment() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         })
 
-        input_filesystem_vncpassword.addTextChangedListener(object : TextWatcher {
+        binding.inputFilesystemVncpassword.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 filesystem.defaultVncPassword = p0.toString()
             }
@@ -178,7 +188,7 @@ class FilesystemEditFragment : Fragment() {
     }
 
     private fun setupImportButton() {
-        import_button.setOnClickListener {
+        binding.importButton.setOnClickListener {
             val filePickerIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             filePickerIntent.addCategory(Intent.CATEGORY_OPENABLE)
             filePickerIntent.type = "application/*"
@@ -197,17 +207,17 @@ class FilesystemEditFragment : Fragment() {
     }
 
     private fun setupAdvancedOptionButton() {
-        val btn = btn_show_advanced_options
+        val btn = binding.btnShowAdvancedOptions
 
         btn.setOnClickListener {
             when (btn.isChecked) {
                 true -> {
                     btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_keyboard_arrow_down_white_24dp, 0)
-                    advanced_options.visibility = View.VISIBLE
+                    binding.advancedOptions.visibility = View.VISIBLE
                 }
                 false -> {
                     btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_keyboard_arrow_right_white_24dp, 0)
-                    advanced_options.visibility = View.INVISIBLE
+                    binding.advancedOptions.visibility = View.INVISIBLE
                 }
             }
         }
@@ -218,7 +228,7 @@ class FilesystemEditFragment : Fragment() {
         if (requestCode == IMPORT_FILESYSTEM_REQUEST_CODE) {
             returnIntent?.data?.let { uri ->
                 filesystemEditViewModel.backupUri = uri
-                text_backup_filename.text = uri.lastPathSegment
+                binding.textBackupFilename.text = uri.lastPathSegment
             }
         }
     }

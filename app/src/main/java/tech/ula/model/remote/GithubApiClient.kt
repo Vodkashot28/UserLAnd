@@ -80,7 +80,7 @@ class GithubApiClient(
             throw err
         }
 
-        val result = adapter.fromJson(response.body()!!.source())!!
+        val result = adapter.fromJson(response.body!!.source())!!
         latestResults[repo] = result
         return@withContext result
     }

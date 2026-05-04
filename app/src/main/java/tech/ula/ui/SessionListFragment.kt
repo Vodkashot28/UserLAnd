@@ -1,7 +1,7 @@
 package tech.ula.ui
 
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,8 +9,8 @@ import android.view.* // ktlint-disable no-wildcard-imports
 import android.widget.AdapterView
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
-import kotlinx.android.synthetic.main.frag_session_list.* // ktlint-disable no-wildcard-imports
 import tech.ula.MainActivity
+import tech.ula.databinding.FragSessionListBinding
 import tech.ula.R
 import tech.ula.ServerService
 import tech.ula.model.entities.Filesystem
@@ -20,6 +20,9 @@ import tech.ula.viewmodel.SessionListViewModel
 import tech.ula.viewmodel.SessionListViewModelFactory
 
 class SessionListFragment : Fragment() {
+
+    private var _binding: FragSessionListBinding? = null
+    private val binding get() = _binding!!
 
     interface SessionSelection {
         fun sessionHasBeenSelected(session: Session)
@@ -37,7 +40,7 @@ class SessionListFragment : Fragment() {
 
     private val sessionListViewModel: SessionListViewModel by lazy {
         val ulaDatabase = UlaDatabase.getInstance(activityContext)
-        ViewModelProviders.of(this, SessionListViewModelFactory(ulaDatabase)).get(SessionListViewModel::class.java)
+        ViewModelProvider(this, SessionListViewModelFactory(ulaDatabase)).get(SessionListViewModel::class.java)
     }
 
     private val sessionsAndFilesystemsChangeObserver = Observer<Pair<List<Session>, List<Filesystem>>> {
@@ -46,7 +49,7 @@ class SessionListFragment : Fragment() {
             filesystemList = pair.second
 
             sessionAdapter = SessionListAdapter(activityContext, sessionList, filesystemList)
-            list_sessions.adapter = sessionAdapter
+            binding.listSessions.adapter = sessionAdapter
         }
     }
 
@@ -65,8 +68,14 @@ class SessionListFragment : Fragment() {
         else super.onOptionsItemSelected(item)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.frag_session_list, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragSessionListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -75,8 +84,8 @@ class SessionListFragment : Fragment() {
 
         sessionListViewModel.getSessionsAndFilesystems().observe(viewLifecycleOwner, sessionsAndFilesystemsChangeObserver)
 
-        registerForContextMenu(list_sessions)
-        list_sessions.onItemClickListener = AdapterView.OnItemClickListener {
+        registerForContextMenu(binding.listSessions)
+        binding.listSessions.onItemClickListener = AdapterView.OnItemClickListener {
             parent, _, position, _ ->
             when (val selectedItem = parent.getItemAtPosition(position) as SessionListItem) {
                 is SessionSeparatorItem -> return@OnItemClickListener
@@ -96,7 +105,7 @@ class SessionListFragment : Fragment() {
         super.onCreateContextMenu(menu, v, menuInfo)
         val info = menuInfo as AdapterView.AdapterContextMenuInfo
         val position = info.position
-        when (val selectedItem = list_sessions.adapter.getItem(position) as SessionListItem) {
+        when (val selectedItem = binding.listSessions.adapter.getItem(position) as SessionListItem) {
             is SessionSeparatorItem -> return
             is SessionItem -> {
                 val session = selectedItem.session
@@ -117,7 +126,7 @@ class SessionListFragment : Fragment() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val menuInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
         val position = menuInfo.position
-        return when (val selectedItem = list_sessions.adapter.getItem(position) as SessionListItem) {
+        return when (val selectedItem = binding.listSessions.adapter.getItem(position) as SessionListItem) {
             is SessionSeparatorItem -> true
             is SessionItem -> {
                 val session = selectedItem.session
