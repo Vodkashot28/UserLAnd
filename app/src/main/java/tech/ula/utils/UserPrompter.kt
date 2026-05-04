@@ -265,6 +265,7 @@ class CollectionOptInPrompter(private val activity: Activity, private val viewGr
             apply()
         }
     }
+}
 
 fun handlePurchaseLogic() {
     // Stubbed for non-Play Store build
