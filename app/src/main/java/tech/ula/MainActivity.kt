@@ -191,9 +191,9 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     private fun setProgressDialogNavListeners() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             currentFragmentDisplaysProgressDialog =
-                    destination.label == getString(R.string.sessions) ||
-                            destination.label == getString(R.string.apps) ||
-                            destination.label == getString(R.string.filesystems)
+                    destination.id == R.id.session_list_fragment ||
+                            destination.id == R.id.app_list_fragment ||
+                            destination.id == R.id.filesystem_list_fragment
             if (!currentFragmentDisplaysProgressDialog) killProgressBar()
             else if (progressBarIsVisible) displayProgressBar()
         }
