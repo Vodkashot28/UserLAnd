@@ -45,10 +45,10 @@ jobs:
       contents: write
     env:
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      SIGNING_STORE_FILE: userland_keystore.jks
-      SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+      SIGNING_STORE_FILE: app/userland_keystore.jks
+      SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
     steps:
     - name: Checkout repository
@@ -65,7 +65,7 @@ jobs:
       run: chmod +x gradlew
 
     - name: Decode keystore
-      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/userland_keystore.jks
+      run: echo "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 -d > app/userland_keystore.jks
 
     - name: Build release APK
       run: ./gradlew assembleRelease
