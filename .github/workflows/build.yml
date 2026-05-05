@@ -10,9 +10,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -44,7 +41,6 @@ jobs:
     permissions:
       contents: write
     env:
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       SIGNING_STORE_FILE: ${{ github.workspace }}/release.keystore
 
     steps:
