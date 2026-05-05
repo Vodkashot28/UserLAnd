@@ -57,10 +57,10 @@ Release APKs are signed via GitHub Actions. The following secrets must be set in
 
 | Secret | Description |
 |---|---|
-| `KEYSTORE_BASE64` | Base64-encoded keystore: `base64 -w 0 userland_keystore.jks` |
-| `SIGNING_STORE_PASSWORD` | Keystore password |
-| `SIGNING_KEY_ALIAS` | Key alias |
-| `SIGNING_KEY_PASSWORD` | Key password |
+| `RELEASE_KEYSTORE` | Base64-encoded keystore: `base64 -w 0 userland_keystore.jks` |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
+| `ANDROID_KEY_ALIAS` | Key alias (check with `keytool -list -keystore userland_keystore.jks`) |
+| `ANDROID_KEY_PASSWORD` | Key password |
 | `SENTRY_DSN` | Sentry DSN for crash reporting |
 
 The keystore file (`userland_keystore.jks`) and any `.txt` credential files must **never** be committed — they are covered by `.gitignore`.

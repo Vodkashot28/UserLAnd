@@ -40,9 +40,6 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: write
-    env:
-      SIGNING_STORE_FILE: ${{ github.workspace }}/release.keystore
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
