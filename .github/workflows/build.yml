@@ -45,27 +45,47 @@ jobs:
       contents: write
     env:
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SIGNING_STORE_FILE: userland_keystore.jks
+      SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Download debug artifact
-      uses: actions/download-artifact@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
       with:
-        name: debug-apk
-        path: release/
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'gradle'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Decode keystore
+      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > userland_keystore.jks
+
+    - name: Build release APK
+      run: ./gradlew assembleRelease
+
+    - name: Clean up keystore
+      if: always()
+      run: rm -f userland_keystore.jks
 
     - name: Read versionName
       run: |
         VERSION=$(grep -m1 'versionName "' app/build.gradle | grep -oP '"\K[^"]+')
+        SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
         echo "version=$VERSION" >> $GITHUB_ENV
+        echo "tag=v${VERSION}-${SHORT_SHA}" >> $GITHUB_ENV
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v${{ env.version }}
-        name: Release ${{ env.version }}
-        files: release/app-debug.apk
+        tag_name: ${{ env.tag }}
+        name: Release ${{ env.version }} (${{ env.tag }})
+        files: app/build/outputs/apk/release/app-release.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

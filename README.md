@@ -52,6 +52,21 @@ cd UserLAnd
 
 ---
 
+## 🔑 Release Signing (CI/CD)
+Release APKs are signed via GitHub Actions. The following secrets must be set in the repository:
+
+| Secret | Description |
+|---|---|
+| `KEYSTORE_BASE64` | Base64-encoded keystore: `base64 -w 0 userland_keystore.jks` |
+| `SIGNING_STORE_PASSWORD` | Keystore password |
+| `SIGNING_KEY_ALIAS` | Key alias |
+| `SIGNING_KEY_PASSWORD` | Key password |
+| `SENTRY_DSN` | Sentry DSN for crash reporting |
+
+The keystore file (`userland_keystore.jks`) and any `.txt` credential files must **never** be committed — they are covered by `.gitignore`.
+
+---
+
 ## 🔒 Permissions
 On Android 13+, the app uses scoped storage — no `READ/WRITE_EXTERNAL_STORAGE` required.  
 A `POST_NOTIFICATIONS` prompt is shown on first launch for foreground service notifications.

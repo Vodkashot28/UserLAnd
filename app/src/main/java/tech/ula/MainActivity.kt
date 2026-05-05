@@ -27,7 +27,6 @@ import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -69,7 +68,9 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     }
 
     private val navController: NavController by lazy {
-        findNavController(R.id.nav_host_fragment)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as androidx.navigation.fragment.NavHostFragment
+        navHostFragment.navController
     }
 
     private val notificationManager by lazy {
@@ -270,8 +271,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         if (item.itemId == R.id.clear_support_files) {
             displayClearSupportFilesDialog()
         }
-        return NavigationUI.onNavDestinationSelected(item,
-                Navigation.findNavController(this, R.id.nav_host_fragment)) ||
+        return NavigationUI.onNavDestinationSelected(item, navController) ||
                 super.onOptionsItemSelected(item)
     }
 

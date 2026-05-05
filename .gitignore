@@ -42,6 +42,7 @@ captures/
 
 # Keystore files
 *.jks
+userland_keystore.txt
 
 # Generated files for deployment
 app/versionCode.txt
