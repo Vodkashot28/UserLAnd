@@ -65,14 +65,14 @@ jobs:
       run: chmod +x gradlew
 
     - name: Decode keystore
-      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > userland_keystore.jks
+      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/userland_keystore.jks
 
     - name: Build release APK
       run: ./gradlew assembleRelease
 
     - name: Clean up keystore
       if: always()
-      run: rm -f userland_keystore.jks
+      run: rm -f app/userland_keystore.jks
 
     - name: Read versionName
       run: |
