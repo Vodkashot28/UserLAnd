@@ -114,6 +114,9 @@ android {
 
     packagingOptions {
         doNotStrip "**/*.so"
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
 }
 
