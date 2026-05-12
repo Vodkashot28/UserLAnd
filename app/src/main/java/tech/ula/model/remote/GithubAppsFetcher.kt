@@ -18,8 +18,8 @@ class GithubAppsFetcher(
     private operator fun <T> List<T>.component6() = get(5)
     private operator fun <T> List<T>.component7() = get(6)
 
-    private val branch = "master" // Base off different support branches for testing.
-    private val baseUrl = "https://github.com/Vodkashot28/UserLAnd-Assets-Support/raw/$branch/apps"
+    private val branch = "main"
+    private val baseUrl = "https://github.com/Vodkashot28/UserLAnd-next-Assets-Support/raw/$branch/apps"
 
     @Throws(IOException::class)
     suspend fun fetchAppsList(): List<App> = withContext(Dispatchers.IO) {
