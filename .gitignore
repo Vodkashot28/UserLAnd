@@ -62,3 +62,11 @@ app/src/main/resources/sentry.properties
 app/src/main/jniLibs/*
 
 userland_keystore.base64.txt
+
+# Keystore files
+*.jks
+*.keystore
+release.keystore
+release.keystore.b64
+userland_keystore.txt
+userland_keystore.base64.txt
