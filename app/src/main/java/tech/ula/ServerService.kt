@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
@@ -55,19 +56,19 @@ class ServerService : Service(), CoroutineScope {
 
         when (intent?.getStringExtra("type")) {
             "start" -> {
-                val session: Session = intent.getParcelableExtra("session")!!
+                val session: Session = intentParcelable(intent, "session", Session::class.java) ?: return START_NOT_STICKY
                 this.launch { startSession(session) }
             }
             "stopApp" -> {
-                val app: App = intent.getParcelableExtra("app")!!
+                val app: App = intentParcelable(intent, "app", App::class.java) ?: return START_NOT_STICKY
                 stopApp(app)
             }
             "restartRunningSession" -> {
-                val session: Session = intent.getParcelableExtra("session")!!
+                val session: Session = intentParcelable(intent, "session", Session::class.java) ?: return START_NOT_STICKY
                 startClient(session)
             }
             "kill" -> {
-                val session: Session = intent.getParcelableExtra("session")!!
+                val session: Session = intentParcelable(intent, "session", Session::class.java) ?: return START_NOT_STICKY
                 killSession(session)
             }
             "filesystemIsBeingDeleted" -> {
@@ -225,5 +226,14 @@ class ServerService : Service(), CoroutineScope {
                 .putExtra("type", "dialog")
                 .putExtra("dialogType", type)
         broadcaster.sendBroadcast(intent)
+    }
+
+    private fun <T : android.os.Parcelable> intentParcelable(intent: Intent, key: String, clazz: Class<T>): T? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(key, clazz)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(key)
+        }
     }
 }

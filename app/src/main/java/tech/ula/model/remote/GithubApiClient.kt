@@ -85,7 +85,10 @@ class GithubApiClient(
             throw err
         }
 
-        val result = response.use { adapter.fromJson(it.body!!.source())!! }
+        val result = response.use {
+            val body = it.body ?: throw IOException("Empty response body from $url")
+            adapter.fromJson(body.source()) ?: throw IOException("Failed to parse response from $url")
+        }
         latestResults[repo] = result
         return@withContext result
     }
