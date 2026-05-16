@@ -65,7 +65,8 @@ class GithubApiClient(
         val releaseToUse = getReleaseToUseForRepo(repo)
         val base = urlProvider.getBaseUrl()
         // Fetch latest release from fork's asset repository
-        val url = base + "repos/Vodkashot28/UserLAnd-Next-Assets-$repo/releases/$releaseToUse"
+        val repoName = if (repo == "debian") "debian12" else repo
+        val url = base + "repos/Vodkashot28/UserLAnd-Next-Assets-$repoName/releases/$releaseToUse"
         val moshi = Moshi.Builder().build()
         val adapter = moshi.adapter(ReleasesResponse::class.java)
         val request = Request.Builder()
