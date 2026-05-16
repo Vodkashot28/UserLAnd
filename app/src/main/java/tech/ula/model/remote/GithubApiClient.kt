@@ -78,12 +78,13 @@ class GithubApiClient(
             throw err
         }
         if (!response.isSuccessful) {
+            response.close()
             val err = IOException("Unexpected code: $response")
             logger.addExceptionBreadcrumb(err)
             throw err
         }
 
-        val result = adapter.fromJson(response.body!!.source())!!
+        val result = response.use { adapter.fromJson(it.body!!.source())!! }
         latestResults[repo] = result
         return@withContext result
     }

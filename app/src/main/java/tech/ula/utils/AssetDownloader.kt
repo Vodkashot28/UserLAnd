@@ -189,45 +189,41 @@ class DownloadManagerWrapper(private val downloadManager: DownloadManager) {
     }
 
     fun downloadHasSucceeded(id: Long): Boolean {
-        val query = generateQuery(id)
-        val cursor = generateCursor(query)
-        if (cursor.moveToFirst()) {
-            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
-            return status == DownloadManager.STATUS_SUCCESSFUL
+        val cursor = generateCursor(generateQuery(id))
+        return cursor.use {
+            if (it.moveToFirst()) it.getInt(it.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL
+            else false
         }
-        return false
     }
 
     fun downloadHasFailed(id: Long): Boolean {
-        val query = generateQuery(id)
-        val cursor = generateCursor(query)
-        if (cursor.moveToFirst()) {
-            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
-            return status == DownloadManager.STATUS_FAILED
+        val cursor = generateCursor(generateQuery(id))
+        return cursor.use {
+            if (it.moveToFirst()) it.getInt(it.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED
+            else false
         }
-        return false
     }
 
     fun getDownloadFailureReason(id: Long): DownloadFailureLocalizationData {
-        val query = generateQuery(id)
-        val cursor = generateCursor(query)
-        if (cursor.moveToFirst()) {
-            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
-            return DownloadFailureLocalizationData(resId = when (status) {
-                in 100..500 -> R.string.download_failure_http_error
-                1008 -> R.string.download_failure_cannot_resume
-                1007 -> R.string.download_failure_no_external_devices
-                1009 -> R.string.download_failure_destination_exists
-                1001 -> R.string.download_failure_unknown_file_error
-                1004 -> R.string.download_failure_http_processing
-                1006 -> R.string.download_failure_insufficient_external_storage
-                1005 -> R.string.download_failure_too_many_redirects
-                1002 -> R.string.download_failure_unhandled_http_response
-                1000 -> R.string.download_failure_unknown_error
-                else -> R.string.download_failure_missing_error
-            }, formatStrings = listOf("$status")) // Format strings only used for http_error
+        val cursor = generateCursor(generateQuery(id))
+        return cursor.use {
+            if (it.moveToFirst()) {
+                val status = it.getInt(it.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
+                DownloadFailureLocalizationData(resId = when (status) {
+                    in 100..500 -> R.string.download_failure_http_error
+                    1008 -> R.string.download_failure_cannot_resume
+                    1007 -> R.string.download_failure_no_external_devices
+                    1009 -> R.string.download_failure_destination_exists
+                    1001 -> R.string.download_failure_unknown_file_error
+                    1004 -> R.string.download_failure_http_processing
+                    1006 -> R.string.download_failure_insufficient_external_storage
+                    1005 -> R.string.download_failure_too_many_redirects
+                    1002 -> R.string.download_failure_unhandled_http_response
+                    1000 -> R.string.download_failure_unknown_error
+                    else -> R.string.download_failure_missing_error
+                }, formatStrings = listOf("$status"))
+            } else DownloadFailureLocalizationData(R.string.download_failure_reason_not_found)
         }
-        return DownloadFailureLocalizationData(R.string.download_failure_reason_not_found)
     }
 
     fun cancelAllDownloads(downloadIds: Set<Long>) {

@@ -230,14 +230,18 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     private fun autoStart() {
         val prefs = getSharedPreferences("apps", Context.MODE_PRIVATE)
         val json = prefs.getString("AutoApp", " ")
-        if (json != null)
-            if (json.compareTo(" ") != 0) {
-                val gson = Gson()
-                val autoApp = gson.fromJson(json, App::class.java)
+        if (json != null && json.compareTo(" ") != 0) {
+            try {
+                val autoApp = Gson().fromJson(json, App::class.java)
                 autoStarted = true
                 appHasBeenSelected(autoApp, true)
+            } catch (e: Exception) {
+                prefs.edit().remove("AutoApp").apply()
             }
+        }
     }
+
+    private var downloadReceiverRegistered = false
 
     override fun onStart() {
         super.onStart()
@@ -250,6 +254,7 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             @Suppress("UnspecifiedRegisterReceiverFlag")
             registerReceiver(downloadBroadcastReceiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
         }
+        downloadReceiverRegistered = true
     }
 
     override fun onResume() {
@@ -283,10 +288,12 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
 
     override fun onStop() {
         super.onStop()
-
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(serverServiceBroadcastReceiver)
-        unregisterReceiver(downloadBroadcastReceiver)
+        if (downloadReceiverRegistered) {
+            unregisterReceiver(downloadBroadcastReceiver)
+            downloadReceiverRegistered = false
+        }
     }
 
     override fun appHasBeenSelected(app: App, autoStart: Boolean) {

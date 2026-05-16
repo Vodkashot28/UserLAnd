@@ -116,8 +116,8 @@ class SessionStartupFsm(
         }
     }
 
-    private fun findFilesystemForSession(session: Session): Filesystem {
-        return filesystems.find { filesystem -> filesystem.id == session.filesystemId }!!
+    private fun findFilesystemForSession(session: Session): Filesystem? {
+        return filesystems.find { filesystem -> filesystem.id == session.filesystemId }
     }
 
     private fun handleSessionSelected(session: Session) {
@@ -132,6 +132,10 @@ class SessionStartupFsm(
         }
 
         val filesystem = findFilesystemForSession(session)
+        if (filesystem == null) {
+            state.postValue(IncorrectSessionTransition(SessionSelected(session), state.value!!))
+            return
+        }
         state.postValue(SessionIsReadyForPreparation(session, filesystem))
     }
 

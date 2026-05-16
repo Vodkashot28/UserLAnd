@@ -43,16 +43,16 @@ class NotificationConstructor(val context: Context) {
         val sessionListIntent = Intent(context, MainActivity::class.java)
         sessionListIntent.type = "sessionList"
         val pendingSessionListIntent = PendingIntent
-                .getActivity(context, 0, sessionListIntent, PendingIntent.FLAG_IMMUTABLE)
+                .getActivity(context, 1, sessionListIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val stopSessionsIntent = Intent(context, ServerService::class.java).putExtra("type", "stopAll")
         val stopSessionsPendingIntent = PendingIntent
-                .getService(context, 0, stopSessionsIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                .getService(context, 2, stopSessionsIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val settingsIntent = Intent(context, MainActivity::class.java)
         settingsIntent.type = "settings"
         val settingsPendingIntent = PendingIntent
-                .getActivity(context, 0, settingsIntent, PendingIntent.FLAG_IMMUTABLE)
+                .getActivity(context, 3, settingsIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(context, serviceNotificationChannelId)
                 .setSmallIcon(R.drawable.ic_stat_icon)

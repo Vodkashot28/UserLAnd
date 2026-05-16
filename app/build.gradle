@@ -200,10 +200,8 @@ ext.libDir = "$project.projectDir/src/main/jniLibs"
 task downloadAssets(type: Download) {
     def assetVersion = "v1.2.7"
     def baseUrl = "https://github.com/Vodkashot28/UserLAnd-next-Assets-Support/releases/download/$assetVersion"
-    for (arch in architectures) {
-        src "$baseUrl/$arch-assets.zip"
-        dest buildDir
-    }
+    src architectures.collect { arch -> "$baseUrl/$arch-assets.zip" }
+    dest buildDir
 }
 
 task fetchAssets(dependsOn: downloadAssets) {

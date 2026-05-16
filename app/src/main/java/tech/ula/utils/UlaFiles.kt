@@ -15,7 +15,8 @@ class UlaFiles(
     val filesDir: File = context.filesDir
     val libDir: File = File(libDirPath)
     val supportDir: File = File(filesDir, "support")
-    val emulatedScopedDir = context.getExternalFilesDir(null)!!
+    val emulatedScopedDir: File = context.getExternalFilesDir(null)
+        ?: context.filesDir // fallback to internal storage if external is unavailable
     val emulatedUserDir = File(emulatedScopedDir, "storage")
 
     val sdCardScopedDir: File? = resolveSdCardScopedStorage(context)

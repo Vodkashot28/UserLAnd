@@ -123,7 +123,14 @@ class ServerService : Service(), CoroutineScope {
         startForeground(NotificationConstructor.serviceNotificationId, notificationManager.buildPersistentServiceNotification())
         session.pid = localServerManager.startServer(session)
 
+        val timeoutMs = 60_000L
+        val startTime = System.currentTimeMillis()
         while (!localServerManager.isServerRunning(session)) {
+            if (System.currentTimeMillis() - startTime > timeoutMs) {
+                sendDialogBroadcast("unhandledSessionServiceType")
+                removeSession(session)
+                return
+            }
             delay(500)
         }
 
