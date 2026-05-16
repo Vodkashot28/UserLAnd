@@ -1,89 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
-    app:strokeWidth="0dp"
-    app:cardBackgroundColor="@color/md_theme_dark_surfaceContainerHigh">
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <include
+        android:id="@+id/app_list_separator"
+        layout="@layout/list_item_separator"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:paddingHorizontal="16dp">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp" />
 
-        <ImageView
-            android:id="@+id/image_list_item_filesystem_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:orientation="vertical"
-            app:layout_constraintStart_toEndOf="@id/image_list_item_filesystem_icon"
-            app:layout_constraintEnd_toStartOf="@id/layout_service_type"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <TextView
-                android:id="@+id/text_list_item_session_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                android:textColor="@color/md_theme_dark_onSurface" />
-
-            <TextView
-                android:id="@+id/text_list_item_filesystem_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                android:textColor="@color/md_theme_dark_onSurfaceVariant" />
-
-        </LinearLayout>
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="2dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:cardBackgroundColor="@color/md_theme_dark_surfaceContainerHigh">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_service_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <TextView
-                android:id="@+id/text_list_item_service_type"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                android:textColor="@color/md_theme_dark_onSurfaceVariant"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/image_list_item_arrow"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:paddingHorizontal="16dp">
 
             <ImageView
-                android:id="@+id/image_list_item_arrow"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:contentDescription="@string/desc_arrow"
-                app:srcCompat="@drawable/ic_arrow_forward_white_24dp"
-                app:tint="@color/md_theme_dark_onSurfaceVariant"
-                app:layout_constraintTop_toBottomOf="@id/text_list_item_service_type"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/image_list_item_filesystem_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical"
+                app:layout_constraintStart_toEndOf="@id/image_list_item_filesystem_icon"
+                app:layout_constraintEnd_toStartOf="@id/layout_service_type"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/text_list_item_session_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="@color/md_theme_dark_onSurface" />
+
+                <TextView
+                    android:id="@+id/text_list_item_filesystem_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="@color/md_theme_dark_onSurfaceVariant" />
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_service_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/text_list_item_service_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                    android:textColor="@color/md_theme_dark_onSurfaceVariant"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/image_list_item_arrow"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_list_item_arrow"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/desc_arrow"
+                    app:srcCompat="@drawable/ic_arrow_forward_white_24dp"
+                    app:tint="@color/md_theme_dark_onSurfaceVariant"
+                    app:layout_constraintTop_toBottomOf="@id/text_list_item_service_type"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>
