@@ -182,10 +182,13 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
     }
 
     private fun setNavStartDestination() {
+        val onboardingDone = getSharedPreferences("onboarding", Context.MODE_PRIVATE)
+            .getBoolean("completed", false)
         val userPreference = defaultSharedPreferences.getString("pref_default_nav_location", "Apps")
         val graph = navController.navInflater.inflate(R.navigation.nav_graph)
-        graph.setStartDestination(when (userPreference) {
-            getString(R.string.sessions) -> R.id.session_list_fragment
+        graph.setStartDestination(when {
+            !onboardingDone -> R.id.onboarding_fragment
+            userPreference == getString(R.string.sessions) -> R.id.session_list_fragment
             else -> R.id.app_list_fragment
         })
         navController.graph = graph

@@ -1,6 +1,6 @@
 <resources>                                                         <!-- Translators, pay attention to these notes! --> 
-    <string name="app_name">UserLAnd Next</string>
-    <string name="welcome">Welcome to UserLAnd!</string>
+    <string name="app_name">UserLAnd-Next</string>
+    <string name="welcome">Welcome to UserLAnd-Next!</string>
     <string name="permission_request_code">1000</string>
 
     <!-- Labels -->
@@ -81,7 +81,7 @@
         %1$s \nWe are working to resolve these issues. You can let us know about this issue on
         Github if you\'d like to help!
     </string>
-    <string name="illegal_state_title">UserLAnd has entered an illegal state!</string>
+    <string name="illegal_state_title">UserLAnd-Next has entered an illegal state!</string>
 
     <string name="illegal_state_transition">Bad state transition: %1$s</string>
 
@@ -124,8 +124,8 @@
     <!-- Notification strings -->
     <string name="services_notification_channel_name">Services</string>
     <string name="services_notification_channel_description">Persistent services</string>
-    <string name="service_notification_title">UserLAnd</string>
-    <string name="service_notification_description">UserLAnd is running a background service.</string>
+    <string name="service_notification_title">UserLAnd-Next</string>
+    <string name="service_notification_description">UserLAnd-Next is running a background service.</string>
 
     <!-- Progress bar messages -->
     <string name="progress_start_step">Getting things ready for you&#8230;</string>
@@ -253,6 +253,12 @@
     <string name="info_xsdl_support">XSDL is not fully supported on Android 9.0 and above yet</string>
     <string name="no_backup_selected">No filesystem import selected</string>
     
+    <string name="onboarding_subtitle">Run full Linux distros on Android — no root required.</string>
+    <string name="onboarding_feature_1">✦ Debian, Ubuntu, and more</string>
+    <string name="onboarding_feature_2">✦ SSH and VNC sessions</string>
+    <string name="onboarding_feature_3">✦ No root needed</string>
+    <string name="onboarding_get_started">Get Started</string>
+
     <!-- Review request -->
     <string name="review_is_user_enjoying">Enjoying UserLAnd?</string>
     <string name="review_ask_for_rating">How about a rating on the Play Store, then?</string>

@@ -52,14 +52,23 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
         AppsListViewModelFactory(appsRepository)
     }
 
+    private var allApps: List<App> = emptyList()
+
     private val appsObserver = Observer<List<App>> {
         it?.let { list ->
-            appsAdapter.updateApps(list)
+            allApps = list
+            appsAdapter.updateApps(filterApps(binding.searchApps.query))
             binding.listApps.scrollToPosition(0)
             if (list.isEmpty() || userlandIsNewVersion()) {
                 doRefresh()
             }
         }
+    }
+
+    private fun filterApps(query: CharSequence?): List<App> {
+        if (query.isNullOrBlank()) return allApps
+        val q = query.toString().lowercase()
+        return allApps.filter { it.name.lowercase().contains(q) }
     }
 
     private val activeAppsObserver = Observer<List<App>> {
@@ -138,6 +147,14 @@ class AppsListFragment : Fragment(), AppsListAdapter.AppsClickHandler {
                 R.color.holo_green_light,
                 R.color.holo_orange_light,
                 R.color.holo_red_light)
+
+        binding.searchApps.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?) = false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                appsAdapter.updateApps(filterApps(newText))
+                return true
+            }
+        })
     }
 
     private fun doRefresh() {

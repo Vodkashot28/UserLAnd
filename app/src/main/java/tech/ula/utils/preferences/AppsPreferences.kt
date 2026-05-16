@@ -14,6 +14,7 @@ class AppsPreferences(context: Context) {
     }
 
     fun getDistributionsList(): Set<String> {
-        return prefs.getStringSet("distributionsList", setOf()) ?: setOf()
+        val default = setOf("debian", "ubuntu")
+        return prefs.getStringSet("distributionsList", default) ?: default
     }
 }

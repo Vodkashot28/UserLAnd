@@ -4,6 +4,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/app_list_fragment" >
+
+    <fragment
+        android:id="@+id/onboarding_fragment"
+        android:name="tech.ula.ui.OnboardingFragment"
+        android:label="Welcome"
+        tools:layout="@layout/frag_onboarding">
+        <action
+            android:id="@+id/action_onboarding_to_app_list"
+            app:destination="@id/app_list_fragment"
+            app:popUpTo="@id/onboarding_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
     <fragment
         android:id="@+id/app_list_fragment"
         android:name="tech.ula.ui.AppsListFragment"
