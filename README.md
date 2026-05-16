@@ -25,6 +25,11 @@ Run full Linux distributions or specific applications directly on Android — no
 Download the latest APK from [Releases](https://github.com/Vodkashot28/UserLAnd/releases).  
 Install it on your Android device and start provisioning your Linux environment.
 
+### 🐧 Debian 12 Setup
+Debian 12 (Bookworm) is the primary supported distro in UserLAnd-Next. Unlike Ubuntu, it is not pre-seeded with a default user — but the app handles this automatically: on first launch it pre-configures the default credentials (`user` / `userland`) so no setup prompt appears. You can change these anytime in the filesystem settings.
+
+From there you can launch desktop environments (LXDE, Xfce) or AI/ML apps (JupyterLab, PyTorch Demo, ONNX Runtime) directly from the app.
+
 ---
 
 ## 🗂️ Asset Repositories

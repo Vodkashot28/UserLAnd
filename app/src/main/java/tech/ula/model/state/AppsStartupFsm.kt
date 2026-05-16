@@ -82,6 +82,14 @@ class AppsStartupFsm(
     }
 
     private fun checkAppsFilesystemCredentials(appsFilesystem: Filesystem) {
+        // Pre-configure defaults for debian12 so no prompt is shown (matches addNonRootUser.sh defaults)
+        if (appsFilesystem.distributionType in listOf("debian", "debian12") &&
+            appsFilesystem.defaultUsername.isEmpty()) {
+            appsFilesystem.defaultUsername = "user"
+            appsFilesystem.defaultPassword = "userland"
+            appsFilesystem.defaultVncPassword = "userland"
+            CoroutineScope(Dispatchers.IO).launch { filesystemDao.updateFilesystem(appsFilesystem) }
+        }
         val credentialsAreSet = appsFilesystem.defaultUsername.isNotEmpty() &&
                 appsFilesystem.defaultPassword.isNotEmpty() &&
                 appsFilesystem.defaultVncPassword.isNotEmpty()
