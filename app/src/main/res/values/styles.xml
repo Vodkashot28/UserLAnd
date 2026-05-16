@@ -35,7 +35,7 @@
         <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
 
-    <style name="preferenceTheme" parent="PreferenceThemeOverlay.Material3">
+    <style name="preferenceTheme" parent="PreferenceThemeOverlay">
         <item name="android:textSize">14sp</item>
     </style>
 
