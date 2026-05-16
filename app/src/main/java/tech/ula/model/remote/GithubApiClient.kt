@@ -39,7 +39,8 @@ class GithubApiClient(
     suspend fun getAssetsListDownloadUrl(repo: String): String = withContext(Dispatchers.IO) {
         val result = latestResults[repo] ?: queryLatestRelease(repo)
 
-        return@withContext result.assets.find { it.name == "${ulaFiles.getArchType()}-assets.txt" }!!.downloadUrl
+        return@withContext result.assets.find { it.name == "${ulaFiles.getArchType()}-assets.txt" }?.downloadUrl
+            ?: throw IOException("Asset not found: ${ulaFiles.getArchType()}-assets.txt in repo $repo")
     }
 
     @Throws(IOException::class)
@@ -54,7 +55,8 @@ class GithubApiClient(
         val result = latestResults[repo] ?: queryLatestRelease(repo)
         val assetName = "${ulaFiles.getArchType()}-$assetType"
 
-        return@withContext result.assets.find { it.name == assetName }!!.downloadUrl
+        return@withContext result.assets.find { it.name == assetName }?.downloadUrl
+            ?: throw IOException("Asset not found: $assetName in repo $repo")
     }
 
     // Query latest release data and memoize results.
@@ -62,8 +64,8 @@ class GithubApiClient(
     private suspend fun queryLatestRelease(repo: String): ReleasesResponse = withContext(Dispatchers.IO) {
         val releaseToUse = getReleaseToUseForRepo(repo)
         val base = urlProvider.getBaseUrl()
-        // Use CypherpunkArmory assets repository (upstream source)
-        val url = base + "repos/CypherpunkArmory/UserLAnd-Assets-$repo/releases/$releaseToUse"
+        // Fetch latest release from fork's asset repository
+        val url = base + "repos/Vodkashot28/UserLAnd-Next-Assets-$repo/releases/$releaseToUse"
         val moshi = Moshi.Builder().build()
         val adapter = moshi.adapter(ReleasesResponse::class.java)
         val request = Request.Builder()

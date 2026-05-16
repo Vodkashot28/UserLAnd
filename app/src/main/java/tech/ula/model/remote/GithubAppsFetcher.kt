@@ -19,7 +19,7 @@ class GithubAppsFetcher(
     private operator fun <T> List<T>.component7() = get(6)
 
     private val branch = "main"
-    private val baseUrl = "https://github.com/Vodkashot28/UserLAnd-next-Assets-Support/raw/$branch/apps"
+    private val baseUrl = "https://raw.githubusercontent.com/Vodkashot28/UserLAnd-next-Assets-Support/$branch/apps"
 
     @Throws(IOException::class)
     suspend fun fetchAppsList(): List<App> = withContext(Dispatchers.IO) {
