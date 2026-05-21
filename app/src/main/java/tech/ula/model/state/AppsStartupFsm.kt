@@ -82,9 +82,10 @@ class AppsStartupFsm(
     }
 
     private fun checkAppsFilesystemCredentials(appsFilesystem: Filesystem) {
+        appsFilesystem.distributionType = appsFilesystem.distributionType.trim()
         // Pre-configure defaults for debian12 so no prompt is shown (matches addNonRootUser.sh defaults)
-        if (appsFilesystem.distributionType in listOf("debian", "debian12") &&
-            appsFilesystem.defaultUsername.isEmpty()) {
+        if (appsFilesystem.distributionType == "debian12" &&
+            (appsFilesystem.defaultUsername.isEmpty() || appsFilesystem.defaultPassword.isEmpty() || appsFilesystem.defaultVncPassword.isEmpty())) {
             appsFilesystem.defaultUsername = "user"
             appsFilesystem.defaultPassword = "userland"
             appsFilesystem.defaultVncPassword = "userland"
@@ -128,16 +129,17 @@ class AppsStartupFsm(
 
     @Throws(NoSuchElementException::class) // If second database call fails
     private suspend fun findAppsFilesystem(app: App): Filesystem = withContext(Dispatchers.IO) {
-        val potentialAppFilesystem = filesystemDao.findAppsFilesystemByType(app.filesystemRequired)
+        val fsType = app.filesystemRequired.trim()
+        val potentialAppFilesystem = filesystemDao.findAppsFilesystemByType(fsType)
 
         if (potentialAppFilesystem.isEmpty()) {
             val deviceArchitecture = ulaFiles.getArchType()
             val fsToInsert = Filesystem(0, name = "apps", archType = deviceArchitecture,
-                    distributionType = app.filesystemRequired, isAppsFilesystem = true)
+                    distributionType = fsType, isAppsFilesystem = true)
             filesystemDao.insertFilesystem(fsToInsert)
         }
 
-        return@withContext filesystemDao.findAppsFilesystemByType(app.filesystemRequired).first()
+        return@withContext filesystemDao.findAppsFilesystemByType(fsType).first()
     }
 
     @Throws(NoSuchElementException::class) // If second database call fails

@@ -37,7 +37,7 @@ class GithubAppsFetcher(
                         supportsGui,
                         isPaidApp,
                         version
-                ) = line.toLowerCase(Locale.ENGLISH).split(",")
+                ) = line.toLowerCase(Locale.ENGLISH).split(",").map { it.trim() }
                 // Construct app
                 App(
                         name,

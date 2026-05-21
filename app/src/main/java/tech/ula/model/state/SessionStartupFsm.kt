@@ -141,6 +141,7 @@ class SessionStartupFsm(
 
     private suspend fun handleRetrieveAssetLists(filesystem: Filesystem) {
         state.postValue(RetrievingAssetLists)
+        filesystem.distributionType = filesystem.distributionType.trim()
 
         val assetList = assetRepository.getAssetList(filesystem.distributionType)
 
