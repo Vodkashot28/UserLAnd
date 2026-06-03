@@ -121,8 +121,11 @@ echo "[ZENCODE] Configuring Python AI environment..."
 if [ ! -d "/root/ai_env" ]; then
     python3 -m venv /root/ai_env
     source /root/ai_env/bin/activate
+    pip install lancedb
 else
     echo "[ZENCODE] ai_env already exists."
+    source /root/ai_env/bin/activate
+    pip install --upgrade lancedb
 fi
 
 # 4. Bind local models to external Termux storage if available
