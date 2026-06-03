@@ -225,7 +225,7 @@ echo -e "\033[?25l"
 while true; do
     show_dashboard
     read -r -n 1 key
-    case "$key" in
+    case "${'$'}key" in
         [mM])
             echo "[COMMAND] Toggling routing infrastructure mode..." >> "${'$'}SERVER_LOG"
             curl -s -X POST "${'$'}API_ENDPOINT/mode/toggle" > /dev/null 2>&1 &
