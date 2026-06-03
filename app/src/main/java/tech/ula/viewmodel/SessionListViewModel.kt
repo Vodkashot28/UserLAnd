@@ -3,7 +3,7 @@ package tech.ula.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.coroutines.GlobalScope
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tech.ula.model.repositories.UlaDatabase
 import tech.ula.model.entities.Filesystem
@@ -27,7 +27,7 @@ class SessionListViewModel(
     }
 
     fun deleteSessionById(id: Long) {
-        GlobalScope.launch { ulaDatabase.sessionDao().deleteSessionById(id) }
+        viewModelScope.launch { ulaDatabase.sessionDao().deleteSessionById(id) }
     }
 }
 

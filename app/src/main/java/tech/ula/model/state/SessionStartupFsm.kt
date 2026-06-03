@@ -2,6 +2,7 @@ package tech.ula.model.state
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,19 +41,28 @@ class SessionStartupFsm(
         state.postValue(ExtractingFilesystem(line))
     }
 
+    private val activeSessionsObserver = Observer<List<Session>> { list ->
+        list?.let {
+            activeSessions.clear()
+            activeSessions.addAll(it)
+        }
+    }
+
+    private val filesystemsObserver = Observer<List<Filesystem>> { list ->
+        list?.let {
+            filesystems.clear()
+            filesystems.addAll(list)
+        }
+    }
+
     init {
-        activeSessionsLiveData.observeForever {
-            it?.let { list ->
-                activeSessions.clear()
-                activeSessions.addAll(list)
-            }
-        }
-        filesystemsLiveData.observeForever {
-            it?.let { list ->
-                filesystems.clear()
-                filesystems.addAll(list)
-            }
-        }
+        activeSessionsLiveData.observeForever(activeSessionsObserver)
+        filesystemsLiveData.observeForever(filesystemsObserver)
+    }
+
+    fun cleanup() {
+        activeSessionsLiveData.removeObserver(activeSessionsObserver)
+        filesystemsLiveData.removeObserver(filesystemsObserver)
     }
 
     fun getState(): LiveData<SessionStartupState> {

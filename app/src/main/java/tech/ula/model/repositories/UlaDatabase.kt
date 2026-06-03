@@ -6,7 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import android.content.Context
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import tech.ula.model.daos.AppsDao
 import tech.ula.model.entities.Filesystem
@@ -50,7 +51,7 @@ abstract class UlaDatabase : RoomDatabase() {
                                 // Since this should only be called when the app is restarted, all
                                 // all child processes should have been killed and sessions should be
                                 // inactive.
-                                GlobalScope.launch { getInstance(context).sessionDao().resetSessionActivity() }
+                                CoroutineScope(Dispatchers.IO).launch { getInstance(context).sessionDao().resetSessionActivity() }
                             }
                         })
                         .build()

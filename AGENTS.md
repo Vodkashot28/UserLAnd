@@ -12,6 +12,7 @@ Run full Linux distros on Android (no root). Maintained fork modernized for Andr
   |-----|------|-----------|------------|
   | `debian12` | Distribution | CLI + GUI | debian12 |
   | `zencode-server` | Development | CLI | debian12 |
+  | `zencode-dashboard` | Development | CLI | debian12 |
   | `vscode-server` | Development | GUI | debian12 |
   | `fs-backup` | Utility | CLI | debian12 |
 

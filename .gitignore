@@ -40,6 +40,9 @@ captures/
 *.iml
 .idea/
 
+# Backup files
+*.bak
+
 # Keystore files
 *.jks
 userland_keystore.txt

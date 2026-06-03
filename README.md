@@ -17,6 +17,7 @@ Run full Linux distributions or specific applications directly on Android — no
 - No root required — sandboxed and secure.
 - Updated for modern Android APIs (13/14).
 - AI/ML-ready Debian 12 rootfs (Python, NumPy, SciPy, pandas).
+- Built-in ZenCode-Server backend + TUI dashboard for local AI model orchestration.
 - CI/CD powered builds with reproducible APKs.
 
 ---
@@ -28,7 +29,7 @@ Install it on your Android device and start provisioning your Linux environment.
 ### 🐧 Debian 12 Setup
 Debian 12 (Bookworm) is the primary supported distro in UserLAnd-Next. Unlike Ubuntu, it is not pre-seeded with a default user — but the app handles this automatically: on first launch it pre-configures the default credentials (`user` / `userland`) so no setup prompt appears. You can change these anytime in the filesystem settings.
 
-From there you can launch desktop environments (LXDE, Xfce) or AI/ML apps (JupyterLab, PyTorch Demo, ONNX Runtime) directly from the app.
+From there you can launch desktop environments (LXDE, Xfce), AI/ML apps (JupyterLab, PyTorch Demo, ONNX Runtime), or dev tools (ZenCode-Server, VS Code Server) directly from the app.
 
 ---
 
@@ -61,8 +62,8 @@ cd UserLAnd
 - Kotlin 1.9.23 + Java 17 (`jvmTarget = "17"`)
 - AndroidX Lifecycle 2.8.3 (ViewModel, LiveData)
 - Room 2.6.1, OkHttp 4.12.0, Moshi 1.15.1
-- Billing 7.1.1 (Google Play Billing)
-- Sentry 7.14.0 for crash reporting
+- Gson 2.11.0 (JSON parsing)
+- Sentry 7.14.0 for crash reporting (DSN empty by default)
 - Coroutines 1.8.1
 - Navigation 2.7.7
 

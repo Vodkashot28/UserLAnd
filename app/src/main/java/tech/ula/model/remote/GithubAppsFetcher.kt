@@ -72,11 +72,11 @@ class GithubAppsFetcher(
         val file = File("$filesDirPath/apps/$directoryAndFilename")
         file.parentFile?.mkdirs()
         val description = when (app.name) {
-            "debian12" -> "An AI/ML-ready distribution optimized for local server runtimes."
-            "zencode-server" -> "ZenCode dynamic local backend context server and hybrid MCP host."
-            "vscode-server" -> "Visual Studio Code Server for remote browser-based engineering workspace."
-            "fs-backup" -> "Automated filesystem snapshot and asset backup utility."
-            "zencode-dashboard" -> "Terminal User Interface to monitor and control local ZenCode-Server nodes."
+            "debian12" -> "Debian 12 Bookworm base system with AI-ready configuration. Includes Python, NumPy, SciPy, and pandas for machine learning workflows."
+            "zencode-server" -> "ZenCode dynamic local backend context server and hybrid MCP host. Provides a Rust-based daemon for routing AI prompts, managing LanceDB vector sync, and orchestrating local/cloud model inference."
+            "vscode-server" -> "Code-Server provides a browser-based VS Code IDE. Runs on port 8080 and supports remote development inside Debian12 sessions."
+            "fs-backup" -> "Filesystem Backup — Archive your entire Linux filesystem to /sdcard/UserLAnd-Next-Backups as a timestamped .tar.gz."
+            "zencode-dashboard" -> "Terminal User Interface to monitor and control local ZenCode-Server nodes. Displays daemon status, CPU/memory, cloud connections, and provides keyboard shortcuts for toggling routing modes and syncing LanceDB."
             else -> ""
         }
         file.writeText(description)
@@ -158,13 +158,38 @@ if ! pgrep -f "zencode-server start" > /dev/null; then
 fi
 ZBLOCK
 
+# 6. Download & Install ZenCode-Server Binary
+CONFIG_URL="https://raw.githubusercontent.com/Vodkashot28/ZenCode-server/Master/assets/default_config.json"
+RELEASE_URL="https://github.com/Vodkashot28/ZenCode-server/releases/latest/download/zencode-assets-arm64.tar.gz"
+
+echo "[ZENCODE] Pulling latest binary from GitHub..."
+curl -L "${'$'}RELEASE_URL" -o /tmp/zencode-assets.tar.gz
+tar -xzf /tmp/zencode-assets.tar.gz -C /usr/local/
+chmod +x /usr/local/bin/zencode-server
+chmod +x /usr/local/bin/zencode-dashboard 2>/dev/null || true
+
+echo "[ZENCODE] Syncing default config from Master branch..."
+mkdir -p /usr/local/etc/zencode-server
+curl -sL "${'$'}CONFIG_URL" -o /usr/local/etc/zencode-server/default_config.json
+
 echo "[ZENCODE] Provisioning Complete. Restart session to activate."
 """
             "vscode-server" -> """#!/bin/bash
-nohup code-server --host 0.0.0.0 --port 8081 --auth none > /dev/null 2>&1 &
+if ! command -v code-server &>/dev/null; then
+    curl -fsSL https://code-server.dev/install.sh | sh
+fi
+
+code-server --bind-addr 0.0.0.0:8080 --auth none
 """
             "fs-backup" -> """#!/bin/bash
-echo "fs-backup utility ready"
+BACKUP_DIR="/sdcard/UserLAnd-Next-Backups"
+mkdir -p "${'$'}BACKUP_DIR"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+ARCHIVE="${'$'}BACKUP_DIR/backup_${'$'}TIMESTAMP.tar.gz"
+
+echo "Creating backup at ${'$'}ARCHIVE ..."
+tar -czf "${'$'}ARCHIVE" --exclude=/proc --exclude=/sys --exclude=/dev / 2>/dev/null
+echo "Done: ${'$'}ARCHIVE"
 """
             "zencode-dashboard" -> """#!/bin/bash
 # =================================================================

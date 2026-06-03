@@ -58,6 +58,7 @@ class MainActivityViewModel(
     override fun onCleared() {
         super.onCleared()
         job.cancel()
+        sessionStartupFsm.cleanup()
     }
 
     init {
