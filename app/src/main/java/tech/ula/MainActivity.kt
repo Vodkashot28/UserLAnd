@@ -43,6 +43,7 @@ import tech.ula.model.repositories.AssetRepository
 import tech.ula.model.repositories.UlaDatabase
 import tech.ula.model.state.* // ktlint-disable no-wildcard-imports
 import tech.ula.ui.AppsListFragment
+import tech.ula.ui.BaseFilteredAppsListFragment
 import tech.ula.ui.SessionListFragment
 import tech.ula.utils.* // ktlint-disable no-wildcard-imports
 import tech.ula.viewmodel.* // ktlint-disable no-wildcard-imports

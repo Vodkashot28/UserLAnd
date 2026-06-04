@@ -26,6 +26,7 @@ import tech.ula.model.remote.GithubAppsFetcher
 import tech.ula.model.repositories.AppsRepository
 import tech.ula.model.repositories.RefreshStatus
 import tech.ula.model.repositories.UlaDatabase
+import tech.ula.utils.* // ktlint-disable no-wildcard-imports
 import tech.ula.utils.preferences.AppsPreferences
 import tech.ula.viewmodel.AppsListViewModel
 import tech.ula.viewmodel.AppsListViewModelFactory
@@ -36,12 +37,12 @@ abstract class BaseFilteredAppsListFragment : Fragment(), AppsListAdapter.AppsCl
         fun appHasBeenSelected(app: App, autoStart: Boolean)
     }
 
-    protected val doOnAppSelection: AppSelection by lazy { activityContext }
+    private val doOnAppSelection: AppSelection by lazy { activityContext }
     protected lateinit var activityContext: MainActivity
     private var _binding: FragAppListBinding? = null
     protected val binding get() = _binding!!
 
-    protected val appsAdapter by lazy { AppsListAdapter(activityContext, this) }
+    private val appsAdapter by lazy { AppsListAdapter(activityContext, this) }
     private var refreshStatus = RefreshStatus.INACTIVE
     private val appsPreferences by lazy { AppsPreferences(activityContext) }
 
