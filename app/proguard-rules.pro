@@ -6,3 +6,6 @@
 # Moshi codegen adapters kept automatically by @JsonClass(generateAdapter=true)
 # Room generated code kept automatically by room compiler
 # Sentry kept automatically by Sentry Android SDK
+
+-dontwarn org.brotli.**
+-dontwarn org.tukaani.**
