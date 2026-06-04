@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import tech.ula.BuildConfig
 import tech.ula.MainActivity
 import tech.ula.R
 import tech.ula.ServerService
@@ -16,7 +17,7 @@ class NotificationConstructor(val context: Context) {
 
     companion object {
         const val serviceNotificationId = 1000
-        const val GROUP_KEY_USERLAND = "tech.ula.userland"
+        val GROUP_KEY_USERLAND = "${BuildConfig.APPLICATION_ID}.userland"
         const val serviceNotificationChannelId = "UserLAnd"
     }
 

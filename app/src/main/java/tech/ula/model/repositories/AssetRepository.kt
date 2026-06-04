@@ -18,6 +18,7 @@ data class DownloadMetadata(
     val assetType: String,
     val versionCode: String,
     val url: String,
+    val mirrorUrls: List<String> = emptyList(),
     val downloadTitle: String = "$assetType-$filename-$versionCode"
 )
 
@@ -25,6 +26,7 @@ class AssetRepository(
     private val applicationFilesDirPath: String,
     private val assetPreferences: AssetPreferences,
     private val githubApiClient: GithubApiClient,
+    private val fallbackAssetProvider: FallbackAssetProvider? = null,
     private val httpStream: HttpStream = HttpStream(),
     private val logger: Logger = SentryLogger()
 ) {
@@ -74,11 +76,34 @@ class AssetRepository(
     suspend fun getAssetList(distributionType: String): List<Asset> {
         return try {
             val list = fetchAssetList(distributionType)
+            if (list.isEmpty()) {
+                return loadHardcodedFallbackAssets(distributionType)
+            }
             assetPreferences.setAssetList(distributionType, list)
             list
         } catch (err: Exception) {
-            assetPreferences.getCachedAssetList(distributionType)
+            val cached = assetPreferences.getCachedAssetList(distributionType)
+            if (cached.isNotEmpty()) return cached
+            loadHardcodedFallbackAssets(distributionType)
         }
+    }
+
+    companion object {
+        val FALLBACK_ASSET_NAMES = listOf(
+            "addNonRootUser.sh",
+            "busybox",
+            "extractFilesystem.sh",
+            "ld.so.preload",
+            "libdisableselinux.so",
+            "nosudo",
+            "userland_profile.sh"
+        )
+    }
+
+    private fun loadHardcodedFallbackAssets(distributionType: String): List<Asset> {
+        val fallback = FALLBACK_ASSET_NAMES.map { Asset(it, distributionType) }
+        assetPreferences.setAssetList(distributionType, fallback)
+        return fallback
     }
 
     private suspend fun fetchAssetList(assetType: String): List<Asset> = withContext(Dispatchers.IO) {
@@ -122,16 +147,20 @@ class AssetRepository(
                     return downloadRequirements
                 }
             } catch (err: UnknownHostException) {
-                // If assets are present but the network is unreachable, don't bother trying
-                // to find updates.
                 return downloadRequirements
             }
         }
 
+        val fallbackProvider = fallbackAssetProvider
+        if (fallbackProvider != null && fallbackProvider.copyToDistributionDirectory(repo, applicationFilesDirPath)) {
+            assetPreferences.setLatestDownloadVersion(repo, GithubApiClient.FALLBACK_TAG)
+            return downloadRequirements
+        }
+
         val filename = "assets.tar.gz"
-        val versionCode = githubApiClient.getLatestReleaseVersion(repo)
-        val url = githubApiClient.getAssetEndpoint(filename, repo)
-        val downloadMetadata = DownloadMetadata(filename, repo, versionCode, url)
+        val versionCode = githubApiClient.getLatestReleaseVersionOrFallback(repo)
+        val (url, mirrorUrls) = buildAssetEndpoints(filename, repo)
+        val downloadMetadata = DownloadMetadata(filename, repo, versionCode, url, mirrorUrls)
         downloadRequirements.add(downloadMetadata)
         return downloadRequirements
     }
@@ -149,10 +178,16 @@ class AssetRepository(
         }
         if (rootFsIsDownloaded && rootFsIsUpToDate) return downloadRequirements
 
-        // If the rootfs is not downloaded, network failures will still propagate.
-        val versionCode = githubApiClient.getLatestReleaseVersion(repo)
-        val url = githubApiClient.getAssetEndpoint(filename, repo)
-        val downloadMetadata = DownloadMetadata(filename, repo, versionCode, url)
+        val versionCode = githubApiClient.getLatestReleaseVersionOrFallback(repo)
+        val (url, mirrorUrls) = buildAssetEndpoints(filename, repo)
+        val downloadMetadata = DownloadMetadata(filename, repo, versionCode, url, mirrorUrls)
         return listOf(downloadMetadata)
+    }
+
+    private suspend fun buildAssetEndpoints(filename: String, repo: String): Pair<String, List<String>> {
+        val endpoints = githubApiClient.getAssetEndpointsWithMirrors(filename, repo)
+        val url = endpoints.first()
+        val mirrorUrls = if (endpoints.size > 1) endpoints.drop(1) else emptyList()
+        return Pair(url, mirrorUrls)
     }
 }

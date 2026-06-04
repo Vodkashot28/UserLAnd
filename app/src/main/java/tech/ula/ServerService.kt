@@ -22,7 +22,7 @@ class ServerService : Service(), CoroutineScope {
         get() = Dispatchers.Default + job
 
     companion object {
-        const val SERVER_SERVICE_RESULT: String = "tech.ula.ServerService.RESULT"
+        val SERVER_SERVICE_RESULT: String = "${BuildConfig.APPLICATION_ID}.ServerService.RESULT"
     }
 
     private val activeSessions: MutableMap<Long, Session> = mutableMapOf()

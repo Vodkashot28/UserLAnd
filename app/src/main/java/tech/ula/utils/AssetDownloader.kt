@@ -31,6 +31,9 @@ class AssetDownloader(
     private val enqueuedDownloadIds = mutableSetOf<Long>()
     private val completedDownloadIds = mutableSetOf<Long>()
 
+    private val downloadMetadataMap = hashMapOf<Long, DownloadMetadata>()
+    private val mirrorIndexMap = hashMapOf<Long, Int>()
+
     init {
         if (!downloadDirectory.exists()) downloadDirectory.mkdirs()
     }
@@ -45,7 +48,6 @@ class AssetDownloader(
         enqueuedDownloadIds.addAll(assetPreferences.getEnqueuedDownloads())
 
         for (id in enqueuedDownloadIds) {
-            // Skip in-progress downloads
             if (!downloadManagerWrapper.downloadHasFailed(id) && !downloadManagerWrapper.downloadHasSucceeded(id)) {
                 continue
             }
@@ -60,12 +62,19 @@ class AssetDownloader(
         assetPreferences.clearEnqueuedDownloadsCache()
         enqueuedDownloadIds.clear()
         completedDownloadIds.clear()
+        downloadMetadataMap.clear()
+        mirrorIndexMap.clear()
 
-        enqueuedDownloadIds.addAll(downloadRequirements.map { metadata ->
+        for (metadata in downloadRequirements) {
             val destination = File(downloadDirectory, metadata.downloadTitle)
             val request = downloadManagerWrapper.generateDownloadRequest(metadata.url, destination)
-            downloadManagerWrapper.enqueue(request)
-        })
+            val downloadId = downloadManagerWrapper.enqueue(request)
+            enqueuedDownloadIds.add(downloadId)
+            downloadMetadataMap[downloadId] = metadata
+            if (metadata.mirrorUrls.isNotEmpty()) {
+                mirrorIndexMap[downloadId] = 0
+            }
+        }
         assetPreferences.setDownloadsAreInProgress(inProgress = true)
         assetPreferences.setEnqueuedDownloads(enqueuedDownloadIds)
     }
@@ -74,6 +83,24 @@ class AssetDownloader(
         if (!downloadIsForUserland(downloadId)) return NonUserlandDownloadFound
 
         if (downloadManagerWrapper.downloadHasFailed(downloadId)) {
+            val metadata = downloadMetadataMap[downloadId]
+            if (metadata != null && mirrorIndexMap.containsKey(downloadId)) {
+                val currentIndex = mirrorIndexMap[downloadId] ?: 0
+                if (currentIndex < metadata.mirrorUrls.size) {
+                    val nextUrl = metadata.mirrorUrls[currentIndex]
+                    mirrorIndexMap[downloadId] = currentIndex + 1
+                    enqueuedDownloadIds.remove(downloadId)
+                    downloadManagerWrapper.cancelAllDownloads(setOf(downloadId))
+                    val destination = File(downloadDirectory, metadata.downloadTitle)
+                    val request = downloadManagerWrapper.generateDownloadRequest(nextUrl, destination)
+                    val newId = downloadManagerWrapper.enqueue(request)
+                    enqueuedDownloadIds.add(newId)
+                    downloadMetadataMap[newId] = metadata
+                    mirrorIndexMap[newId] = currentIndex + 1
+                    assetPreferences.setEnqueuedDownloads(enqueuedDownloadIds)
+                    return CompletedDownloadsUpdate(completedDownloadIds.size, enqueuedDownloadIds.size)
+                }
+            }
             val reason = downloadManagerWrapper.getDownloadFailureReason(downloadId)
             downloadManagerWrapper.cancelAllDownloads(enqueuedDownloadIds)
             return AssetDownloadFailure(reason)
@@ -90,6 +117,8 @@ class AssetDownloader(
 
         enqueuedDownloadIds.clear()
         completedDownloadIds.clear()
+        downloadMetadataMap.clear()
+        mirrorIndexMap.clear()
         assetPreferences.setDownloadsAreInProgress(inProgress = false)
         assetPreferences.clearEnqueuedDownloadsCache()
         return AllDownloadsCompletedSuccessfully

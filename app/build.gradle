@@ -235,6 +235,50 @@ task checkIfAssetsMissing {
 
 preBuild.dependsOn checkIfAssetsMissing
 
+def coreAssetFiles = [
+    "addNonRootUser.sh", "busybox", "extractFilesystem.sh",
+    "ld.so.preload", "libdisableselinux.so", "nosudo", "userland_profile.sh"
+]
+def extractedFallbackDir = "$buildDir/fallback-extracted"
+def fallbackAssetsDir = "$projectDir/src/main/assets/fallback"
+
+task downloadFallbackAssets(type: Download) {
+    src "https://github.com/Vodkashot28/UserLAnd-Next-Assets-debian12/releases/download/v1.0.0/arm64-assets.tar.gz"
+    dest buildDir
+}
+
+task extractFallbackAssets(dependsOn: downloadFallbackAssets) {
+    doLast {
+        def extractDir = file(extractedFallbackDir)
+        extractDir.mkdirs()
+        copy {
+            from tarTree("$buildDir/arm64-assets.tar.gz")
+            into extractDir
+        }
+        def destDir = file(fallbackAssetsDir)
+        destDir.mkdirs()
+        for (filename in coreAssetFiles) {
+            copy {
+                from "$extractedFallbackDir/$filename"
+                into destDir
+            }
+        }
+        file("$fallbackAssetsDir/busybox").setExecutable(true, false)
+        file("$fallbackAssetsDir/libdisableselinux.so").setExecutable(true, false)
+    }
+}
+
+task checkIfFallbackAssetsMissing {
+    for (filename in coreAssetFiles) {
+        if (!file("$fallbackAssetsDir/$filename").exists()) {
+            dependsOn 'extractFallbackAssets'
+            break
+        }
+    }
+}
+
+preBuild.dependsOn checkIfFallbackAssetsMissing
+
 dependencies {
     def moshi_version = '1.15.1'
     def okhttp_version = '4.12.0'

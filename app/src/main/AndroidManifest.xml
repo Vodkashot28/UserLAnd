@@ -75,7 +75,7 @@
 
         <provider
             android:name="tech.ula.provider.UlaDocProvider"
-            android:authorities="tech.ula.documents"
+            android:authorities="${applicationId}.documents"
             android:grantUriPermissions="true"
             android:exported="true"
             android:permission="android.permission.MANAGE_DOCUMENTS">

@@ -27,9 +27,19 @@ class GithubApiClient(
     private val client = OkHttpClient()
     private val latestResults: HashMap<String, ReleasesResponse?> = hashMapOf()
 
-    // This function can be used to tune the release used for each asset type for testing purposes.
+    companion object {
+        const val REPO_OWNER = "Vodkashot28"
+        const val REPO_PREFIX = "UserLAnd-Next-Assets-"
+        const val FALLBACK_TAG = "v1.0.0"
+    }
+
     private fun getReleaseToUseForRepo(repo: String): String {
         return "latest"
+    }
+
+    private fun getAssetDownloadUrl(repo: String, filename: String): String {
+        val arch = ulaFiles.getArchType()
+        return "https://github.com/$REPO_OWNER/$REPO_PREFIX$repo/releases/download/$FALLBACK_TAG/$arch-$filename"
     }
 
     @Throws(IOException::class)
@@ -56,12 +66,44 @@ class GithubApiClient(
             ?: throw IOException("Asset not found: $assetName in repo $repo")
     }
 
-    // Query latest release data and memoize results.
+    suspend fun getAssetEndpointOrFallback(assetType: String, repo: String): String {
+        return getAssetEndpointsWithMirrors(assetType, repo).first()
+    }
+
+    suspend fun getAssetEndpointsWithMirrors(assetType: String, repo: String): List<String> {
+        val primaryUrl = try {
+            getAssetEndpoint(assetType, repo)
+        } catch (err: IOException) {
+            getAssetDownloadUrl(repo, assetType)
+        }
+        val mirrorUrls = buildMirrorUrls(assetType, repo)
+        return listOf(primaryUrl) + mirrorUrls
+    }
+
+    suspend fun getLatestReleaseVersionOrFallback(repo: String): String {
+        return try {
+            getLatestReleaseVersion(repo)
+        } catch (err: IOException) {
+            FALLBACK_TAG
+        }
+    }
+
+    private fun buildMirrorUrls(assetType: String, repo: String): List<String> {
+        val arch = ulaFiles.getArchType()
+        val filename = "$arch-$assetType"
+        val repoFull = "$REPO_PREFIX$repo"
+        val tag = FALLBACK_TAG
+        return listOf(
+            "https://github.com/$REPO_OWNER/$repoFull/releases/download/$tag/$filename",
+            "https://cdn.jsdelivr.net/gh/$REPO_OWNER/$repoFull@$tag/$filename"
+        )
+    }
+
     @Throws(IOException::class, UnknownHostException::class)
     private suspend fun queryLatestRelease(repo: String): ReleasesResponse = withContext(Dispatchers.IO) {
         val releaseToUse = getReleaseToUseForRepo(repo)
         val base = urlProvider.getBaseUrl()
-        val url = base + "repos/Vodkashot28/UserLAnd-Next-Assets-$repo/releases/$releaseToUse"
+        val url = base + "repos/$REPO_OWNER/$REPO_PREFIX$repo/releases/$releaseToUse"
         val moshi = Moshi.Builder().build()
         val adapter = moshi.adapter(ReleasesResponse::class.java)
         val request = Request.Builder()
