@@ -5,6 +5,8 @@
 
     <!-- Labels -->
     <string name="apps">Apps</string>                               <!-- This is a button, so the word used should be short! -->
+    <string name="tab_debian">Debian</string>
+    <string name="tab_zencode">ZenCode</string>
     <string name="sessions">Sessions</string>
     <string name="edit_session">Edit Session</string>
     <string name="filesystems">Filesystems</string>

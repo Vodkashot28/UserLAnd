@@ -28,6 +28,18 @@
     </fragment>
 
     <fragment
+        android:id="@+id/debian_apps_fragment"
+        android:name="tech.ula.ui.DebianAppsFragment"
+        android:label="@string/tab_debian"
+        tools:layout="@layout/frag_app_list" />
+
+    <fragment
+        android:id="@+id/zencode_apps_fragment"
+        android:name="tech.ula.ui.ZenCodeAppsFragment"
+        android:label="@string/tab_zencode"
+        tools:layout="@layout/frag_app_list" />
+
+    <fragment
         android:id="@+id/app_details_fragment"
         android:name="tech.ula.ui.AppDetailsFragment"
         android:label="App Description"

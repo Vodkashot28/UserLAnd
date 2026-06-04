@@ -51,7 +51,7 @@ import tech.ula.model.repositories.DownloadMetadata
 import tech.ula.utils.preferences.* // ktlint-disable no-wildcard-imports
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
-class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, AppsListFragment.AppSelection, FilesystemListFragment.FilesystemListProgress {
+class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, BaseFilteredAppsListFragment.AppSelection, FilesystemListFragment.FilesystemListProgress {
 
     val className = "MainActivity"
 
@@ -189,6 +189,8 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
         graph.setStartDestination(when {
             !onboardingDone -> R.id.onboarding_fragment
             userPreference == getString(R.string.sessions) -> R.id.session_list_fragment
+            userPreference == getString(R.string.tab_debian) -> R.id.debian_apps_fragment
+            userPreference == getString(R.string.tab_zencode) -> R.id.zencode_apps_fragment
             else -> R.id.app_list_fragment
         })
         navController.graph = graph
@@ -199,6 +201,8 @@ class MainActivity : AppCompatActivity(), SessionListFragment.SessionSelection, 
             currentFragmentDisplaysProgressDialog =
                     destination.id == R.id.session_list_fragment ||
                             destination.id == R.id.app_list_fragment ||
+                            destination.id == R.id.debian_apps_fragment ||
+                            destination.id == R.id.zencode_apps_fragment ||
                             destination.id == R.id.filesystem_list_fragment
             if (!currentFragmentDisplaysProgressDialog) killProgressBar()
             else if (progressBarIsVisible) displayProgressBar()
