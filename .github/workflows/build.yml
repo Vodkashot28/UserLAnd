@@ -67,6 +67,19 @@ jobs:
         SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
+    - name: Upload R8 mapping
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: r8-mapping-release
+        path: |
+          app/build/outputs/mapping/release/mapping.txt
+          app/build/outputs/mapping/release/usage.txt
+          app/build/outputs/mapping/release/seeds.txt
+          app/build/outputs/mapping/release/configuration.txt
+        retention-days: 90
+        if-no-files-found: warn
+
     - name: Clean up keystore
       if: always()
       run: rm -f release.keystore
