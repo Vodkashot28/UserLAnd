@@ -7,5 +7,13 @@
 # Room generated code kept automatically by room compiler
 # Sentry kept automatically by Sentry Android SDK
 
+-keep public class * extends androidx.fragment.app.Fragment
+-keepclassmembers class * extends androidx.lifecycle.ViewModel {
+    <init>(...);
+}
+-keepclassmembers class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}
+
 -dontwarn org.brotli.**
 -dontwarn org.tukaani.**
