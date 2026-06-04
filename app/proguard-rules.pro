@@ -15,5 +15,12 @@
     public static final ** CREATOR;
 }
 
+-keep public class androidx.navigation.NavType { *; }
+-keep public class androidx.navigation.NavType$* { *; }
+
+-keep class tech.ula.model.entities.App { *; }
+-keep class tech.ula.model.entities.Session { *; }
+-keep class tech.ula.model.entities.Filesystem { *; }
+
 -dontwarn org.brotli.**
 -dontwarn org.tukaani.**
